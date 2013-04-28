@@ -47,4 +47,4 @@ You are -- as always -- more than welcome to suggest additions and improvements.
 
 ## Thanks to...
 
-... [Riot](//riothq.com/) for making [Hammer](//hammerformac.com/) where the inspiration for the syntax came. I'm using Hammer daily for my static experiments and hacks, and it's the best way to build simple static sites.
+... [Riot](http://riothq.com/) for making [Hammer](http://hammerformac.com/) where the inspiration for the syntax came. I'm using Hammer daily for my static experiments and hacks, and it's the best way to build simple static sites.
