@@ -124,7 +124,7 @@ class Yogurt {
 
         if ((($operator == "is" || $operator == "==") && $variables[$variable] == $value) or
             (($operator == "isnt" || $operator == "!=") && $variables[$variable] != $value) or
-            (isset($variables[$variable]) && is_string($variables[$variable]))) {
+            isset($variables[$variable])) {
           # Return a proper block if operators are valid and statement is true or variable exists
           $block = $block; }
         else {
