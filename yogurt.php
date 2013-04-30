@@ -112,7 +112,9 @@ class Yogurt {
         $template = str_replace($match, self::$settings["error_message"], $template); }
       else if (!empty($if_operator) || !empty($if_exists)) {
         # Variable to check
-        $variable = str_replace("$", "", !empty($if_operator) ? $if_operator[1] : $if_exists[1]);
+        $variable = !empty($if_operator) ? $if_operator[1] : $if_exists[1];
+        # Remove variable prefix
+        $variable = str_replace("$", "", $variable);
         # Type of if statement; is or is not
         $operator = !empty($if_operator) ? $if_operator[2] : null;
         # Value to check against $key
