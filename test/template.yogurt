@@ -37,6 +37,10 @@
     <!-- @include _partial.html -->
     <!-- endif -->
 
+    <!-- @if $title -->
+    <p><code>$title</code> exists.</p>
+    <!-- endif -->
+
     <!-- @if title is Yogurt -->
     <!-- @include _partial.html -->
     <!-- endif -->

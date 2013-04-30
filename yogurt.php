@@ -101,25 +101,29 @@ class Yogurt {
     preg_match_all("/<!-- @if[\s\S]*?endif -->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
-      # Match essential info in if statement
-      preg_match("/<!-- @if (\\$[\w]*) (.*) \"(.*)\" -->([\s\S]*)<!-- endif -->/", $match, $info);
+      # Match essential info in if statement;
+      # first one matches if statement with operator,
+      # and the second matches an if exists statement
+      preg_match("/<!-- @if (\\$[\w]*) (.*) \"(.*)\" -->([\s\S]*)<!-- endif -->/", $match, $if_operator);
+      preg_match("/<!-- @if (\\$[\w]*) -->([\s\S]*)<!-- endif -->/", $match, $if_exists);
 
-      if (empty($info)) {
+      if (empty($if_operator) && empty($if_exists)) {
         # Render error message if we don't have all the necessary info
         $template = str_replace($match, self::$settings["error_message"], $template); }
-      else {
+      else if (!empty($if_operator) || !empty($if_exists)) {
         # Variable to check
-        $variable = str_replace("$", "", $info[1]);
+        $variable = str_replace("$", "", !empty($if_operator) ? $if_operator[1] : $if_exists[1]);
         # Type of if statement; is or is not
-        $operator = $info[2];
+        $operator = !empty($if_operator) ? $if_operator[2] : null;
         # Value to check against $key
-        $value = $info[3];
+        $value = !empty($if_operator) ? $if_operator[3] : null;
         # Block to render/parse
-        $block = $info[4];
+        $block = !empty($if_operator) ? $if_operator[4] : $if_exists[2];
 
         if ((($operator == "is" || $operator == "==") && $variables[$variable] == $value) or
-          (($operator == "isnt" || $operator == "!=") && $variables[$variable] != $value)) {
-          # Return a proper block if operators are valid and statement1 is true
+            (($operator == "isnt" || $operator == "!=") && $variables[$variable] != $value) or
+            (isset($variables[$variable]) && is_string($variables[$variable]))) {
+          # Return a proper block if operators are valid and statement is true or variable exists
           $block = $block; }
         else {
           # Return empty string as block if no matches
