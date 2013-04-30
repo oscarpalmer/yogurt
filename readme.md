@@ -20,9 +20,13 @@ The best way to learn how Yogurt works is to check out the example in [test](tes
 
 #### If statements
 
-`<!-- if $variable is "Yogurt" -->Yes!<!-- endif -->`; renders "Yes!" if `$variable` is "Yogurt".
+`<!-- @if $variable is "Yogurt" -->Yes!<!-- endif -->`; renders "Yes!" if `$variable` is "Yogurt".
 
 The operator can also be `isnt`, `==`, and `!=` instead of `is`.
+
+##### If-exists statements
+
+`<!-- @if $variable -->Exists.<!-- endif -->`; renders "Exists." if `$variable` exists.
 
 #### Includes
 
