@@ -151,12 +151,15 @@ class Yogurt {
     foreach ($matches[0] as $match) {
       # Remove unnescary info
       $partial = str_replace(array("<!-- @include ", " -->"), "", $match);
+      # If partial is a variable
+      if (strpos($partial, "$") === 0) {
+        $partial = self::parse_variables("<!-- $partial -->", $variables); }
       # Partial file
       $partial = self::$settings["partial_dir"] . $partial;
       # Read partial file if it exists
       $partial = file_exists($partial) ? file_get_contents($partial) : self::$settings["no_partial"];
       # Replace include with partial
-      $template = str_replace($match, $partial, $template); }
+      $template = str_replace($match, self::parse($partial, $variables), $template); }
 
     return $template;
   }
