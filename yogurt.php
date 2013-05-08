@@ -178,7 +178,7 @@ class Yogurt {
     $variables = self::dot_notation_array($variables);
 
     foreach ($variables as $key => $value) {
-      if (is_string($value)) {
+      if (is_string($value) || is_numeric($value)) {
         # Replace variable with its value if it's a string
         $template = str_replace("<!-- \$$key -->", $value, $template); } }
 
