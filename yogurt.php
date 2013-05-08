@@ -75,17 +75,17 @@ class Yogurt {
         $template = str_replace($match, self::$settings["error_message"], $template); }
       else {
         # Array to loop
-        $array = str_replace("$", "", $info[1]);
+        $array    = str_replace("$", "", $info[1]);
         # Name of first-level children
         $variable = str_replace("$", "", $info[2]);
         # Block to render/parse
-        $blk = $info[3];
+        $block    = $info[3];
         # Returned HTML
-        $new = "";
+        $new      = "";
 
         foreach (self::not_a_dot_key($variables, $array) as $item => $value) {
           # Add each rendered/parsed block to $new
-          $new .= self::parse($blk, array($variable => $value)); }
+          $new .= self::parse($block, array($variable => $value)); }
 
         # Replace entire loop with or rendered/parsed HTML
         $template = str_replace($match, $new, $template); } }
@@ -119,12 +119,13 @@ class Yogurt {
         $variable = !empty($if_operator) ? $if_operator[1] : $if_exists[1];
         # Remove variable prefix
         $variable = str_replace("$", "", $variable);
+
         # Type of if statement; is or is not
         $operator = !empty($if_operator) ? $if_operator[2] : null;
         # Value to check against $key
-        $value = !empty($if_operator) ? $if_operator[3] : null;
+        $value   = !empty($if_operator) ? $if_operator[3] : null;
         # Block to render/parse
-        $block = !empty($if_operator) ? $if_operator[4] : $if_exists[2];
+        $block   = !empty($if_operator) ? $if_operator[4] : $if_exists[2];
 
         $it_is   = (($operator == "is" || $operator == "==") && $dot_array[$variable] == $value) ? true : false;
         $it_isnt = (($operator == "isnt" || $operator == "!=") && $dot_array[$variable] != $value) ? true : false;
@@ -157,13 +158,16 @@ class Yogurt {
     foreach ($matches[0] as $match) {
       # Remove unnescary info
       $partial = str_replace(array("<!-- @include ", " -->"), "", $match);
+
       # If partial is a variable
       if (strpos($partial, "$") === 0) {
         $partial = $dot_array[str_replace("$", "", $partial)]; }
+
       # Partial file
       $partial = self::$settings["partial_dir"] . $partial;
       # Read partial file if it exists
       $partial = file_exists($partial) ? file_get_contents($partial) : self::$settings["no_partial"];
+
       # Replace include with partial
       $template = str_replace($match, self::parse($partial, $variables), $template); }
 
@@ -218,7 +222,9 @@ class Yogurt {
     * @return Value found in array
     */
   private static function not_a_dot_key($array, $key) {
+    # Get all parts of key
     $keys = explode(".", $key);
+    # Get the last part
     $last = array_pop($keys);
 
     while ($array_key = array_shift($keys)) {
