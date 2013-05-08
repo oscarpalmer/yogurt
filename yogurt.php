@@ -122,9 +122,11 @@ class Yogurt {
         # Block to render/parse
         $block = !empty($if_operator) ? $if_operator[4] : $if_exists[2];
 
-        if ((($operator == "is" || $operator == "==") && $variables[$variable] == $value) or
-            (($operator == "isnt" || $operator == "!=") && $variables[$variable] != $value) or
-            isset($variables[$variable])) {
+        $it_is   = (($operator == "is" || $operator == "==") && $variables[$variable] == $value) ? true : false;
+        $it_isnt = (($operator == "isnt" || $operator == "!=") && $variables[$variable] != $value) ? true : false;
+
+        if ((!empty($if_operator) && ($it_is || $it_isnt)) ||
+            (!empty($if_exists) && isset($variables[$variable]))) {
           # Return a proper block if operators are valid and statement is true or variable exists
           $block = $block; }
         else {
