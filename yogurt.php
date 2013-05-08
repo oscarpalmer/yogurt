@@ -42,11 +42,15 @@ class Yogurt {
     * @param array $variables Variables to render
     * @return string Parsed template
     */
-  private static function parse($template, $variables) {
-    $template = self::parse_ifs($template, $variables);
-    $template = self::parse_loops($template, $variables);
-    $template = self::parse_includes($template, $variables);
-    $template = self::parse_variables($template, $variables);
+  private static function parse($template, $variables, $dot_array = null) {
+    # A dot array for nicer traversal
+    $dot_array = self::dot_notation_array($variables);
+
+    # Parse it!
+    $template = self::parse_ifs($template, $variables, $dot_array);
+    $template = self::parse_loops($template, $variables, $dot_array);
+    $template = self::parse_includes($template, $variables, $dot_array);
+    $template = self::parse_variables($template, $variables, $dot_array);
 
     return $template;
   }
@@ -58,13 +62,13 @@ class Yogurt {
     * @param array $variables Variables to render
     * @return string Parsed template
     */
-  private static function parse_loops($template, $variables) {
+  private static function parse_loops($template, $variables, $dot_array) {
     # Match all loops
     preg_match_all("/<!-- @loop[\s\S]*?endloop -->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
       # Match essential info in loop
-      preg_match("/<!-- @loop (\\$[\w]*) [-~] (\\$[\w]*) -->([\s\S]*)<!-- endloop -->/", $match, $info);
+      preg_match("/<!-- @loop (\\$[\S]*) [-~] (\\$[\S]*) -->([\s\S]*)<!-- endloop -->/", $match, $info);
 
       if (empty($info)) {
         # Render error message if we don't have all the necessary info
@@ -79,7 +83,7 @@ class Yogurt {
         # Returned HTML
         $new = "";
 
-        foreach ($variables[$array] as $item => $value) {
+        foreach (self::not_a_dot_key($variables, $array) as $item => $value) {
           # Add each rendered/parsed block to $new
           $new .= self::parse($blk, array($variable => $value)); }
 
@@ -96,7 +100,7 @@ class Yogurt {
     * @param array $variables Variables to render
     * @return string Parsed template
     */
-  private static function parse_ifs($template, $variables) {
+  private static function parse_ifs($template, $variables, $dot_array) {
     # Match all if statements
     preg_match_all("/<!-- @if[\s\S]*?endif -->/", $template, $matches);
 
@@ -104,8 +108,8 @@ class Yogurt {
       # Match essential info in if statement;
       # first one matches if statement with operator,
       # and the second matches an if exists statement
-      preg_match("/<!-- @if (\\$[\w]*) (.*) \"(.*)\" -->([\s\S]*)<!-- endif -->/", $match, $if_operator);
-      preg_match("/<!-- @if (\\$[\w]*) -->([\s\S]*)<!-- endif -->/", $match, $if_exists);
+      preg_match("/<!-- @if (\\$[\S]*) (.*) \"([\s\S]*)\" -->([\s\S]*)<!-- endif -->/", $match, $if_operator);
+      preg_match("/<!-- @if (\\$[\S]*) -->([\s\S]*)<!-- endif -->/", $match, $if_exists);
 
       if (empty($if_operator) && empty($if_exists)) {
         # Render error message if we don't have all the necessary info
@@ -122,11 +126,11 @@ class Yogurt {
         # Block to render/parse
         $block = !empty($if_operator) ? $if_operator[4] : $if_exists[2];
 
-        $it_is   = (($operator == "is" || $operator == "==") && $variables[$variable] == $value) ? true : false;
-        $it_isnt = (($operator == "isnt" || $operator == "!=") && $variables[$variable] != $value) ? true : false;
+        $it_is   = (($operator == "is" || $operator == "==") && $dot_array[$variable] == $value) ? true : false;
+        $it_isnt = (($operator == "isnt" || $operator == "!=") && $dot_array[$variable] != $value) ? true : false;
 
         if ((!empty($if_operator) && ($it_is || $it_isnt)) ||
-            (!empty($if_exists) && isset($variables[$variable]))) {
+            (!empty($if_exists) && isset($dot_array[$variable]))) {
           # Return a proper block if operators are valid and statement is true or variable exists
           $block = $block; }
         else {
@@ -146,16 +150,16 @@ class Yogurt {
     * @param array $variables Variables to render
     * @return string Parsed template
     */
-  private static function parse_includes($template, $variables) {
+  private static function parse_includes($template, $variables, $dot_array) {
     # Match all includes
-    preg_match_all("/<\!-- @include .+ -->/", $template, $matches);
+    preg_match_all("/<\!-- @include .* -->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
       # Remove unnescary info
       $partial = str_replace(array("<!-- @include ", " -->"), "", $match);
       # If partial is a variable
       if (strpos($partial, "$") === 0) {
-        $partial = self::parse_variables("<!-- $partial -->", $variables); }
+        $partial = $dot_array[str_replace("$", "", $partial)]; }
       # Partial file
       $partial = self::$settings["partial_dir"] . $partial;
       # Read partial file if it exists
@@ -173,13 +177,10 @@ class Yogurt {
     * @param array $variables Variables to render
     * @return string Parsed template
     */
-  private static function parse_variables($template, $variables) {
-    # Convert array to a dot notation array
-    $variables = self::dot_notation_array($variables);
-
-    foreach ($variables as $key => $value) {
+  private static function parse_variables($template, $variables, $dot_array) {
+    foreach ($dot_array as $key => $value) {
       if (is_string($value) || is_numeric($value)) {
-        # Replace variable with its value if it's a string
+        # Replace variable with its value if it's a string or numerical
         $template = str_replace("<!-- \$$key -->", $value, $template); } }
 
     return $template;
@@ -207,5 +208,24 @@ class Yogurt {
       $return[join(".", $keys)] = $key; }
 
     return $return;
+  }
+
+  /**
+    * Uses a dot notation key to retrieve value in a multidimensional array.
+    *
+    * @param array $array Array to search
+    * @param string $key String to use as key
+    * @return Value found in array
+    */
+  private static function not_a_dot_key($array, $key) {
+    $keys = explode(".", $key);
+    $last = array_pop($keys);
+
+    while ($array_key = array_shift($keys)) {
+      if (!array_key_exists($array_key, $array)) {
+        $array[$array_key] = array(); }
+      $array = &$array[$array_key]; }
+
+    return $array[$last];
   }
 }
