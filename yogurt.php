@@ -108,7 +108,7 @@ class Yogurt {
       # Match essential info in if statement;
       # first one matches if statement with operator,
       # and the second matches an if exists statement
-      preg_match("/<!-- @if (\\$[\S]*) (.*) \"([\s\S]*)\" -->([\s\S]*)<!-- endif -->/", $match, $if_operator);
+      preg_match("/<!-- @if (\\$[\S]*) (.*) (\"[\s\S]*\"|\\$[\S]*) -->([\s\S]*)<!-- endif -->/", $match, $if_operator);
       preg_match("/<!-- @if (\\$[\S]*) -->([\s\S]*)<!-- endif -->/", $match, $if_exists);
 
       if (empty($if_operator) && empty($if_exists)) {
@@ -123,7 +123,7 @@ class Yogurt {
         # Type of if statement; is or is not
         $operator = !empty($if_operator) ? $if_operator[2] : null;
         # Value to check against $key
-        $value   = !empty($if_operator) ? $if_operator[3] : null;
+        $value   = !empty($if_operator) ? str_replace(array("$", "\""), "", $if_operator[3]) : null;
         # Block to render/parse
         $block   = !empty($if_operator) ? $if_operator[4] : $if_exists[2];
 
