@@ -26,10 +26,10 @@ class Yogurt {
   private static function parse($template, $variables) {
     $variables = self::array_to_object($variables);
 
-    $template = self::parse_ifs($template, $variables);
-    $template = self::parse_foreach($template, $variables);
-    $template = self::parse_includes($template, $variables);
-    $template = self::parse_variables($template, $variables);
+    $template = self::parse_ifs($template);
+    $template = self::parse_foreach($template);
+    $template = self::parse_includes($template);
+    $template = self::parse_variables($template);
 
     ob_start() and extract(get_object_vars($variables));
     eval("?>" . $template);
@@ -37,7 +37,7 @@ class Yogurt {
   }
 
   # Parse foreach-loops
-  private static function parse_foreach($template, $variables) {
+  private static function parse_foreach($template) {
     preg_match_all("/<!--\s+?@foreach[\s\S]+?endforeach\s+?-->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
@@ -52,7 +52,7 @@ class Yogurt {
   }
 
   # Parse if-statements
-  private static function parse_ifs($template, $variables) {
+  private static function parse_ifs($template) {
     $template = preg_replace("/<!--\s+?else\s+?-->/", "<?php else: ?>", $template);
 
     preg_match_all("/<!--\s+?@if[\s\S]+?endif\s+-->/", $template, $if_matches);
@@ -83,14 +83,13 @@ class Yogurt {
 
         $template = str_replace($match, "<?php elseif ($key$opera$value): ?>", $template); }
       else {
-        $template = str_replace($match, self::$settings["error_message"], $template); }
-    }
+        $template = str_replace($match, self::$settings["error_message"], $template); } }
 
     return $template;
   }
 
   # Parse includes
-  private static function parse_includes($template, $variables) {
+  private static function parse_includes($template) {
     preg_match_all("/<\!--\s+?@include\s+?.+?\s+?-->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
@@ -108,7 +107,7 @@ class Yogurt {
   }
 
   # Parse variables
-  private static function parse_variables($template, $variables) {
+  private static function parse_variables($template) {
     preg_match_all("/<!--\s+?\\$\S+?\s+?-->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
