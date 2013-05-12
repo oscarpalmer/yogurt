@@ -43,7 +43,6 @@ Errors are rendered "silently" as comments. Why? Because things that _can_ rende
 ## Todo
 
 + Better error handling -- i.e. more errors
-+ Nested tags
 + JavaScript version
 + Ruby version
 
