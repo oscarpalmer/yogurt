@@ -53,37 +53,48 @@ class Yogurt {
 
   # Parse if-statements
   private static function parse_ifs($template) {
+    $if = array(
+      "exists"   => "/<!--\s+?if\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/",
+      "global"   => "/<!--\s+?if[\s\S]+?endif\s+-->/",
+      "operator" => "/<!--\s+?if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/");
+
+    $elseif = array(
+      "exists"   => "/<!--\s+?else\s+?if\s+?(\\$\S+?)\s+?-->/",
+      "global"   => "/<!--\s+?else\s+?if[\s\S]+?-->/",
+      "operator" => "/<!--\s+?else\s+?if\s+(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->/");
+
+    $template = self::parse_if_statements($template, "if", $if);
+    $template = self::parse_if_statements($template, "elseif", $elseif);
     $template = preg_replace("/<!--\s+?else\s+?-->/", "<?php else: ?>", $template);
 
-    preg_match_all("/<!--\s+?if[\s\S]+?endif\s+-->/", $template, $if_matches);
-    preg_match_all("/<!--\s+?else\s+?if[\s\S]+?-->/", $template, $if_else_matches);
+    return $template;
+  }
 
-    foreach ($if_matches[0] as $match) {
-      preg_match("/<!--\s+?if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/", $match, $if_operator);
-      preg_match("/<!--\s+?if\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/", $match, $if_exists);
+  private static function parse_if_statements($template, $type, $regex) {
+    $if = $type == "if" ? true : false;
 
-      if (!empty($if_operator) || !empty($if_exists)) {
-        $key   = str_replace(".", "->", empty($if_operator) ? $if_exists[1] : $if_operator[1]);
-        $value = empty($if_operator) ? "" : "\"" . str_replace(array("$", "\""), "", $if_operator[3]) . "\"";
-        $opera = empty($if_operator) ? "" : (($if_operator[2] == "is" || $if_operator[2] == "==") ? " == " : " != ");
-        $block = empty($if_operator) ? $if_exists[2] : $if_operator[4];
+    $open_if  = $type;
+    $close_if = $if ? "<?php endif; ?>" : "";
 
-        $template = str_replace($match, "<?php if ($key$opera$value): ?>$block<?php endif; ?>", $template); }
-      else {
-        $template = str_replace($match, self::$settings["error_message"], $template); } }
+    preg_match_all($regex["global"], $template, $matches);
 
-    foreach ($if_else_matches[0] as $match) {
-      preg_match("/<!--\s+?else\s+?if\s+(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->/", $match, $if_operator);
-      preg_match("/<!--\s+?else\s+?if\s+?(\\$\S+?)\s+?-->/", $match, $if_exists);
+    foreach ($matches[0] as $match) {
+      preg_match($regex["operator"], $match, $if_operator);
+      preg_match($regex["exists"], $match, $if_exists);
 
       if (!empty($if_operator) || !empty($if_exists)) {
-        $key   = str_replace(".", "->", empty($if_operator) ? $if_exists[1] : $if_operator[1]);
-        $value = empty($if_operator) ? "" : "\"" . str_replace(array("$", "\""), "", $if_operator[3]) . "\"";
-        $opera = empty($if_operator) ? "" : (($if_operator[2] == "is" || $if_operator[2] == "==") ? " == " : " != ");
+        $no = empty($if_operator) ? true : false;
 
-        $template = str_replace($match, "<?php elseif ($key$opera$value): ?>", $template); }
+        $key    = self::dotkey_to_objkey($no ? $if_exists[1] : $if_operator[1]);
+        $value  = $no ? "" : $if_operator[3];
+        $opera  = $no ? "" : (($if_operator[2] == "is" || $if_operator[2] == "==") ? " == " : " != ");
+        $block  = $if ? ($no ? $if_exists[2] : $if_operator[4]) : "";
+
+        $template = str_replace($match, "<?php $open_if ($key$opera$value): ?>$block$close_if", $template); }
       else {
-        $template = str_replace($match, self::$settings["error_message"], $template); } }
+        $template = str_replace($match, self::$settings["error_message"], $template);
+      }
+    }
 
     return $template;
   }
@@ -112,7 +123,7 @@ class Yogurt {
 
     foreach ($matches[0] as $match) {
       $key = preg_replace("/<!--\s+?(\\$\S+?)\s+?-->/", "$1", $match);
-      $key = str_replace(".", "->", $key);
+      $key = self::dotkey_to_objkey($key);
 
       $template = str_replace($match, "<?php echo $key; ?>", $template); }
 
@@ -131,5 +142,10 @@ class Yogurt {
           $obj->{$key} = $value; } } }
 
     return $obj;
+  }
+
+  # Convert dot notation key to object key
+  private static function dotkey_to_objkey($key) {
+    return str_replace(".", "->", $key);
   }
 }
