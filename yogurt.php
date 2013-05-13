@@ -38,10 +38,10 @@ class Yogurt {
 
   # Parse foreach-loops
   private static function parse_foreach($template) {
-    preg_match_all("/<!--\s+?@foreach[\s\S]+?endforeach\s+?-->/", $template, $matches);
+    preg_match_all("/<!--\s+?foreach[\s\S]+?endforeach\s+?-->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
-      preg_match("/<!--\s+?@foreach\s+?(\\$\S+?)\s+?as\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endforeach\s+?-->/", $match, $info);
+      preg_match("/<!--\s+?foreach\s+?(\\$\S+?)\s+?as\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endforeach\s+?-->/", $match, $info);
 
       if (!empty($info)) {
         $template = str_replace($match, "<?php foreach ({$info[1]} as {$info[2]}): ?>{$info[3]}<?php endforeach; ?>", $template); }
@@ -55,12 +55,12 @@ class Yogurt {
   private static function parse_ifs($template) {
     $template = preg_replace("/<!--\s+?else\s+?-->/", "<?php else: ?>", $template);
 
-    preg_match_all("/<!--\s+?@if[\s\S]+?endif\s+-->/", $template, $if_matches);
+    preg_match_all("/<!--\s+?if[\s\S]+?endif\s+-->/", $template, $if_matches);
     preg_match_all("/<!--\s+?else\s+?if[\s\S]+?-->/", $template, $if_else_matches);
 
     foreach ($if_matches[0] as $match) {
-      preg_match("/<!--\s+?@if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/", $match, $if_operator);
-      preg_match("/<!--\s+?@if\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/", $match, $if_exists);
+      preg_match("/<!--\s+?if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/", $match, $if_operator);
+      preg_match("/<!--\s+?if\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/", $match, $if_exists);
 
       if (!empty($if_operator) || !empty($if_exists)) {
         $key   = str_replace(".", "->", empty($if_operator) ? $if_exists[1] : $if_operator[1]);
@@ -90,10 +90,10 @@ class Yogurt {
 
   # Parse includes
   private static function parse_includes($template) {
-    preg_match_all("/<\!--\s+?@include\s+?.+?\s+?-->/", $template, $matches);
+    preg_match_all("/<\!--\s+?include\s+?.+?\s+?-->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
-      $file = preg_replace("/<!--\s+?@include\s+?(.+?)\s+?-->/", "$1", $match);
+      $file = preg_replace("/<!--\s+?include\s+?(.+?)\s+?-->/", "$1", $match);
       $file = self::$settings["partial_dir"] . $file;
 
       if (file_exists($file)) {
