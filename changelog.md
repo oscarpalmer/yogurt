@@ -1,5 +1,11 @@
 # Yogurt Changelog
 
+## 0.2 RC2
+
+Monday madness.
+
++ Error handling
+
 ## 0.2 RC1
 
 Sunday hackathon.
