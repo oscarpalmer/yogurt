@@ -20,21 +20,21 @@ The best way to learn how Yogurt works is to check out the example in [test](tes
 
 #### If statements
 
-`<!-- @if $variable is "Yogurt" -->Yes!<!-- endif -->`; renders "Yes!" if `$variable` is "Yogurt".
+`<!-- if $variable is "Yogurt" -->Yes!<!-- endif -->`; renders "Yes!" if `$variable` is "Yogurt".
 
 The operator can also be `isnt`, `==`, and `!=` instead of `is`.
 
 ##### If-exists statements
 
-`<!-- @if $variable -->Exists.<!-- endif -->`; renders "Exists." if `$variable` exists.
+`<!-- if $variable -->Exists.<!-- endif -->`; renders "Exists." if `$variable` exists.
 
 #### Includes
 
-`<!-- @include file.html -->`; reads the file and renders its content.
+`<!-- include file.html -->`; reads the file and renders its content.
 
 #### Loops
 
-`<!-- @loop $list ~ $item --><!-- $item --><!-- endloop -->`; runs a foreach loop on `$list` where direct descendants are called `$item`. Renders the block within the loop tags.
+`<!-- foreach $list as $item --><!-- $item --><!-- endforeach -->`; runs a foreach loop on `$list` where direct descendants are called `$item`. Renders the block within the loop tags.
 
 #### Errors
 
@@ -42,6 +42,7 @@ Errors are rendered "silently" as comments. Why? Because things that _can_ rende
 
 ## Todo
 
++ Improve parse_ifs-function; DRY
 + Better error handling -- i.e. more errors
 + JavaScript version
 + Ruby version
