@@ -1,5 +1,7 @@
 <?php
 
+set_error_handler("Yogurt::error_handler");
+
 class Yogurt {
   # Settings for Yogurt
   private static $settings = array(
@@ -70,6 +72,7 @@ class Yogurt {
     return $template;
   }
 
+  # Help parse if-statements
   private static function parse_if_statements($template, $type, $regex) {
     $if = $type == "if" ? true : false;
 
@@ -147,5 +150,13 @@ class Yogurt {
   # Convert dot notation key to object key
   private static function dotkey_to_objkey($key) {
     return str_replace(".", "->", $key);
+  }
+
+  # Custom errors for Yogurt.
+  public static function error_handler($number, $string, $file, $line, $variables) {
+    if (strpos($file, __FILE__) === 0) {
+      echo "<!-- Sorry, something went wrong. PHP says \"$string\" can be found on line $line. -->\n"; }
+    else {
+      return false; }
   }
 }
