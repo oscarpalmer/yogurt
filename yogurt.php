@@ -90,7 +90,7 @@ class Yogurt {
 
   # Parse includes
   private static function parse_includes($template) {
-    preg_match_all("/<\!--\s+?include\s+?.+?\s+?-->/", $template, $matches);
+    preg_match_all("/<!--\s+?include\s+?.+?\s+?-->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
       $file = preg_replace("/<!--\s+?include\s+?(.+?)\s+?-->/", "$1", $match);
