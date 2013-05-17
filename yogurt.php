@@ -10,6 +10,9 @@ class Yogurt {
     "partial_dir"   => "./"
   );
 
+  # Class-accessible array of variables
+  private static $variables;
+
   # Start a new parser/renderer
   function __construct($settings = array()) {
     foreach ($settings as $key => $value) {
@@ -26,14 +29,14 @@ class Yogurt {
 
   # Parse template
   private static function parse($template, $variables) {
-    $variables = self::array_to_object($variables);
+    self::$variables = self::array_to_object($variables);
 
     $template = self::parse_ifs($template);
     $template = self::parse_foreach($template);
     $template = self::parse_includes($template);
     $template = self::parse_variables($template);
 
-    ob_start() and extract(get_object_vars($variables));
+    ob_start() and extract(get_object_vars(self::$variables));
     eval("?>" . $template);
     return ob_get_clean();
   }
@@ -104,10 +107,16 @@ class Yogurt {
 
   # Parse includes
   private static function parse_includes($template) {
+    $variables = get_object_vars(self::$variables);
+
     preg_match_all("/<!--\s+?include\s+?.+?\s+?-->/", $template, $matches);
 
     foreach ($matches[0] as $match) {
       $file = preg_replace("/<!--\s+?include\s+?(.+?)\s+?-->/", "$1", $match);
+
+      if (strpos($file, "$") === 0) {
+        $file = $variables[self::dotkey_to_objkey(str_replace("$", "", $file))]; }
+
       $file = self::$settings["partial_dir"] . $file;
 
       if (file_exists($file)) {
