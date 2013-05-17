@@ -24,21 +24,23 @@ class Yogurt {
     if (empty(self::$settings)) {
       return; }
 
-    return self::parse($template, $variables);
+    self::$variables = self::array_to_object($variables);
+
+    $template = self::parse($template, $variables);
+
+    ob_start() and extract(get_object_vars(self::$variables));
+    eval("?>" . $template);
+    return ob_get_clean();
   }
 
   # Parse template
-  private static function parse($template, $variables) {
-    self::$variables = self::array_to_object($variables);
-
+  private static function parse($template) {
     $template = self::parse_ifs($template);
     $template = self::parse_foreach($template);
     $template = self::parse_includes($template);
     $template = self::parse_variables($template);
 
-    ob_start() and extract(get_object_vars(self::$variables));
-    eval("?>" . $template);
-    return ob_get_clean();
+    return $template;
   }
 
   # Parse foreach-loops
@@ -124,7 +126,8 @@ class Yogurt {
       else {
         $partial = self::$settings["no_partial"]; }
 
-      $template = str_replace($match, $partial, $template); }
+      $template = str_replace($match, $partial, $template);
+      $template = self::parse($template); }
 
     return $template;
   }
