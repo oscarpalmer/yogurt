@@ -51,6 +51,7 @@ class Yogurt {
       preg_match("/<!--\s+?foreach\s+?(\\$\S+?)\s+?as\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endforeach\s+?-->/", $match, $info);
 
       if (!empty($info)) {
+        $key = self::dotkey_to_objkey($info[1]);
         $template = str_replace($match, "<?php foreach ({$info[1]} as {$info[2]}): ?>{$info[3]}<?php endforeach; ?>", $template); }
       else {
         $template = str_replace($match, self::$settings["error_message"], $template); } }
@@ -60,47 +61,51 @@ class Yogurt {
 
   # Parse if-statements
   private static function parse_ifs($template) {
-    $if = array(
-      "exists"   => "/<!--\s+?if\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/",
-      "global"   => "/<!--\s+?if[\s\S]+?endif\s+-->/",
-      "operator" => "/<!--\s+?if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+-->/");
+    $global = array(
+      "if"     => "/<!--\s+?if[\s\S]+?endif\s+?-->/",
+      "elseif" => "/<!--\s+?else\s+?if[\s\S]+?-->/"
+    );
 
-    $elseif = array(
-      "exists"   => "/<!--\s+?else\s+?if\s+?(\\$\S+?)\s+?-->/",
-      "global"   => "/<!--\s+?else\s+?if[\s\S]+?-->/",
-      "operator" => "/<!--\s+?else\s+?if\s+(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->/");
+    $regex = array(
+      "if" => array(
+        "exists"   => "/<!--\s+?if\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+?-->/",
+        "operator" => "/<!--\s+?if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+?-->/"),
+      "elseif" => array(
+        "exists"   => "/<!--\s+?else\s+?if\s+?(\\$\S+?)\s+?-->/",
+        "operator" => "/<!--\s+?else\s+?if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->/"));
 
-    $template = self::parse_if_statements($template, "if", $if);
-    $template = self::parse_if_statements($template, "elseif", $elseif);
+    $template = self::parse_if_statements($template, $global, $regex);
     $template = preg_replace("/<!--\s+?else\s+?-->/", "<?php else: ?>", $template);
 
     return $template;
   }
 
   # Help parse if-statements
-  private static function parse_if_statements($template, $type, $regex) {
-    $if = $type == "if" ? true : false;
+  private static function parse_if_statements($template, $global, $regex) {
+    foreach ($global as $name => $pattern) {
+      preg_match_all($pattern, $template, $matches);
 
-    $open_if  = $type;
-    $close_if = $if ? "<?php endif; ?>" : "";
+      $open  = $name;
+      $close = $name == "if" ? "<?php endif; ?>" : "";
 
-    preg_match_all($regex["global"], $template, $matches);
+      foreach ($matches[0] as $match) {
+        preg_match($regex[$name]["exists"], $match, $exists);
+        preg_match($regex[$name]["operator"], $match, $operator);
 
-    foreach ($matches[0] as $match) {
-      preg_match($regex["operator"], $match, $if_operator);
-      preg_match($regex["exists"], $match, $if_exists);
+        if (empty($exists) && empty($operator)) {
+          $replacement = str_replace($match, self::$settings["error_message"], $template); }
+        else if (!empty($exists)) {
+          $key = self::dotkey_to_objkey($exists[1]);
+          $blk = $name == "if" ? $exists[2] : "";
 
-      if (!empty($if_operator) || !empty($if_exists)) {
-        $no = empty($if_operator) ? true : false;
+          $template = str_replace($match, "<?php $open (isset($key) && $key != null): ?>$blk$close", $template); }
+        else {
+          $key = self::dotkey_to_objkey($operator[1]);
+          $opr = ($operator[2] == "is" || $operator[2] == "==") ? "==" : "!=";
+          $blk = $name == "if" ? $operator[4] : "";
 
-        $key    = self::dotkey_to_objkey($no ? $if_exists[1] : $if_operator[1]);
-        $value  = $no ? "" : $if_operator[3];
-        $opera  = $no ? "" : (($if_operator[2] == "is" || $if_operator[2] == "==") ? " == " : " != ");
-        $block  = $if ? ($no ? $if_exists[2] : $if_operator[4]) : "";
-
-        $template = str_replace($match, "<?php $open_if ($key$opera$value): ?>$block$close_if", $template); }
-      else {
-        $template = str_replace($match, self::$settings["error_message"], $template);
+          $template = str_replace($match, "<?php $open ($key $opr $operator[3]): ?>$blk$close", $template);
+        }
       }
     }
 
