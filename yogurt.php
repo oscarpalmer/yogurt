@@ -52,7 +52,7 @@ class Yogurt {
 
       if (!empty($info)) {
         $key = self::dotkey_to_objkey($info[1]);
-        $template = str_replace($match, "<?php foreach ({$info[1]} as {$info[2]}): ?>{$info[3]}<?php endforeach; ?>", $template); }
+        $template = str_replace($match, "<?php foreach ($key as {$info[2]}): ?>{$info[3]}<?php endforeach; ?>", $template); }
       else {
         $template = str_replace($match, self::$settings["error_message"], $template); } }
 
