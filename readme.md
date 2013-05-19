@@ -42,8 +42,7 @@ Errors are rendered "silently" as comments. Why? Because things that _can_ rende
 
 ## Todo
 
-+ Improve parse_ifs-function; DRY
-+ Better error handling -- i.e. more errors
++ caching?
 + JavaScript version
 + Ruby version
 
