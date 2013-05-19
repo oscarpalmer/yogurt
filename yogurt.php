@@ -102,7 +102,7 @@ class Yogurt {
         else {
           $key = self::dotkey_to_objkey($operator[1]);
           $opr = ($operator[2] == "is" || $operator[2] == "==") ? "==" : "!=";
-          $val = strpos($operator[3]) === 0 ? self::dotkey_to_objkey($operator[3]) : $operator[3];
+          $val = strpos($operator[3], "$") === 0 ? self::dotkey_to_objkey($operator[3]) : $operator[3];
           $blk = $name == "if" ? $operator[4] : "";
 
           $template = str_replace($match, "<?php $open ($key $opr $val): ?>$blk$close", $template);
