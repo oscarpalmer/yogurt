@@ -24,7 +24,7 @@ class Yogurt {
     self::$variables = self::array_to_object($_variables_);
 
     ob_start() && extract(get_object_vars(self::$variables));
-    eval("?>" . self::parse($_template_, $variables));
+    eval("?>" . self::parse($_template_));
     return ob_get_clean();
   }
 
