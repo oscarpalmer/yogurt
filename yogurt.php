@@ -20,16 +20,11 @@ class Yogurt {
   }
 
   # Render HTML
-  public static function render($template, $variables) {
-    if (empty(self::$settings)) {
-      return; }
+  public static function render($_template_, $_variables_) {
+    self::$variables = self::array_to_object($_variables_);
 
-    self::$variables = self::array_to_object($variables);
-
-    $template = self::parse($template, $variables);
-
-    ob_start() and extract(get_object_vars(self::$variables));
-    eval("?>" . $template);
+    ob_start() && extract(get_object_vars(self::$variables));
+    eval("?>" . self::parse($_template_, $variables));
     return ob_get_clean();
   }
 
