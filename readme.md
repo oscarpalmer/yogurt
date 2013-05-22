@@ -12,31 +12,49 @@ Like I said, I disliked adding Twig to every little project that used templates.
 
 The best way to learn how Yogurt works is to check out the example in [test](test). But if you want, you can read about the various Yogurt tags below and how they work.
 
-### Tags
+### Variables
 
-#### Variables
+`<!-- $variable -->`; renders the value of `$variable`.
 
-`<!-- $variable -->`; where $variable is "Yogurt" renders as `Yogurt`.
+### Includes
 
-#### If statements
+`<!-- include $variable -->`,  
+`<!-- include partial.html -->`
 
-`<!-- if $variable is "Yogurt" -->Yes!<!-- endif -->`; renders "Yes!" if `$variable` is "Yogurt".
+Reads, parses, and renders the included file.
 
-The operator can also be `isnt`, `==`, and `!=` instead of `is`.
+### Foreach loops
 
-##### If-exists statements
+`<!-- foreach $list as $item -->BLOCK<!-- endforeach -->`
 
-`<!-- if $variable -->Exists.<!-- endif -->`; renders "Exists." if `$variable` exists.
+Renders `BLOCK` for all direct descendants of `$list`.
 
-#### Includes
+### If-statements
 
-`<!-- include file.html -->`; reads the file and renders its content.
+`<!-- if $variable is $variable -->BLOCK<!-- endif -->`,  
+`<!-- if $variable is "value" -->BLOCK<!-- endif -->`
 
-#### Loops
+Renders `BLOCK` if the statements is true.
 
-`<!-- foreach $list as $item --><!-- $item --><!-- endforeach -->`; runs a foreach loop on `$list` where direct descendants are called `$item`. Renders the block within the loop tags.
+#### Else if
 
-#### Errors
+`<!-- else if $variable is $variable -->BLOCK<!-- endif -->`,  
+`<!-- else if $variable is "value" -->BLOCK<!-- endif -->`
+
+Renders `BLOCK` if the statements is true and if the statement is used after a regular if or another else-if statement; see line 47-51 in [the template](test/template.html).
+
+#### If-exists
+
+`<!-- if $variable -->BLOCK<!-- endif -->`,  
+`<!-- else if $variable -->BLOCK<!-- endif -->`
+
+Renders `BLOCK` if the variable `$variable` exists. The second statement should be used after a regular if or else-if statement.
+
+## PHP only
+
+The `Yogurt::render()` function can take a third parameter -- `true` or `false`; `false` by default -- which allows you to bypass the parsing if your template is just PHP.
+
+## Errors
 
 Errors are rendered "silently" as comments. Why? Because things that _can_ render _should_ render.
 

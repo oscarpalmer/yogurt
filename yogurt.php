@@ -20,11 +20,14 @@ class Yogurt {
   }
 
   # Render HTML
-  public static function render($_template_, $_variables_) {
+  public static function render($_template_, $_variables_, $_php_only_ = false) {
     self::$variables = self::array_to_object($_variables_);
 
+    if (!$_php_only_) {
+      $_template_ = self::parse($_template_); }
+
     ob_start() && extract(get_object_vars(self::$variables));
-    eval("?>" . self::parse($_template_));
+    eval("?>" . $_template_);
     return ob_get_clean();
   }
 
@@ -93,7 +96,7 @@ class Yogurt {
           $key = self::dotkey_to_objkey($exists[1]);
           $blk = $name == "if" ? $exists[2] : "";
 
-          $template = str_replace($match, "<?php $open (isset($key) && $key != null): ?>$blk$close", $template); }
+          $template = str_replace($match, "<?php $open (isset($key)): ?>$blk$close", $template); }
         else {
           $key = self::dotkey_to_objkey($operator[1]);
           $opr = ($operator[2] == "is" || $operator[2] == "==") ? "==" : "!=";

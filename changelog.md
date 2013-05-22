@@ -1,5 +1,11 @@
 # Yogurt Changelog
 
+## 0.2 (2013-05-22)
+
+Final release of 0.2.
+
++ third parameter of `Yogurt::render()` allows to render pure (and only) PHP
+
 ## 0.2 RC2 (2013-05-13)
 
 Monday madness.
