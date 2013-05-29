@@ -25,7 +25,7 @@ Reads, parses, and renders the included file.
 
 ### Foreach loops
 
-`<!-- foreach $list as $item -->BLOCK<!-- endforeach -->`
+`<!-- $list : $item -->BLOCK<!-- $list; -->`
 
 Renders `BLOCK` for all direct descendants of `$list`.
 
