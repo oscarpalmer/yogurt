@@ -3,6 +3,38 @@
 set_error_handler("Yogurt::error_handler");
 
 class Yogurt {
+  # Regex for statements
+  private static $regex = array(
+    "ifs" => array(
+      "global" => array(
+        "if"     => "/<!--\s+?if[\s\S]+?endif\s+?-->/",
+        "elseif" => "/<!--\s+?else\s+?if[\s\S]+?-->/"
+      ),
+      "matchr" => array(
+        "if" => array(
+          "exists"   => "/<!--\s+?if\s+?(\\$[\w\-\.]+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+?-->/",
+          "operator" => "/<!--\s+?if\s+?(\\$[\w\-\.]+?)\s+?(.+?)\s+?(\\$[\w\-\.]+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+?-->/"
+        ),
+        "elseif" => array(
+          "exists"   => "/<!--\s+?else\s+?if\s+?(\\$[\w\-\.]+?)\s+?-->/",
+          "operator" => "/<!--\s+?else\s+?if\s+?(\\$[\w\-\.]+?)\s+?(.+?)\s+?(\\$[\w\-\.]+?|\"[\s\S]+?\")\s+?-->/"
+        )
+      )
+    ),
+    "foreachs" => array(
+      "global" => "/<!--\s+?(\\$[\w\-\.]+?)[\s\S]+?\g{1};\s+?-->/",
+      "matchr" => "/<!--\s+?(\\$[\w\-\.]+?)\s*?:\s*?(\\$[\w\-\.]+?)\s+?-->([\s\S]+?)<!--\s+?\g{1};\s+?-->/"
+    ),
+    "includes" => array(
+      "global" => "/<!--\s+?include\s+?.+?\s+?-->/",
+      "matchr" => "/<!--\s+?include\s+?(.+?)\s+?-->/"
+    ),
+    "vars" => array(
+      "global" => "/<!--\s+?\\$[\w\-\.]+?\s+?-->/",
+      "matchr" => "/<!--\s+?(\\$[\w\-\.]+?)\s+?-->/"
+    )
+  );
+
   # Settings for Yogurt
   private static $settings = array(
     "error_message" => "<!-- Sorry, check your syntax. -->",
@@ -43,10 +75,10 @@ class Yogurt {
 
   # Parse foreach-loops
   private static function parse_foreach($template) {
-    preg_match_all("/<!--\s+?foreach[\s\S]+?endforeach\s+?-->/", $template, $matches);
+    preg_match_all(self::$regex["foreachs"]["global"], $template, $matches);
 
     foreach ($matches[0] as $match) {
-      preg_match("/<!--\s+?foreach\s+?(\\$\S+?)\s+?as\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endforeach\s+?-->/", $match, $info);
+      preg_match(self::$regex["foreachs"]["matchr"], $match, $info);
 
       if (!empty($info)) {
         $key = self::dotkey_to_objkey($info[1]);
@@ -59,20 +91,7 @@ class Yogurt {
 
   # Parse if-statements
   private static function parse_ifs($template) {
-    $global = array(
-      "if"     => "/<!--\s+?if[\s\S]+?endif\s+?-->/",
-      "elseif" => "/<!--\s+?else\s+?if[\s\S]+?-->/"
-    );
-
-    $regex = array(
-      "if" => array(
-        "exists"   => "/<!--\s+?if\s+?(\\$\S+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+?-->/",
-        "operator" => "/<!--\s+?if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+?-->/"),
-      "elseif" => array(
-        "exists"   => "/<!--\s+?else\s+?if\s+?(\\$\S+?)\s+?-->/",
-        "operator" => "/<!--\s+?else\s+?if\s+?(\\$\S+?)\s+?(.+?)\s+?(\\$\S+?|\"[\s\S]+?\")\s+?-->/"));
-
-    $template = self::parse_if_statements($template, $global, $regex);
+    $template = self::parse_if_statements($template, self::$regex["ifs"]["global"], self::$regex["ifs"]["matchr"]);
     $template = preg_replace("/<!--\s+?else\s+?-->/", "<?php else: ?>", $template);
 
     return $template;
@@ -115,10 +134,10 @@ class Yogurt {
   private static function parse_includes($template) {
     $variables = get_object_vars(self::$variables);
 
-    preg_match_all("/<!--\s+?include\s+?.+?\s+?-->/", $template, $matches);
+    preg_match_all(self::$regex["includes"]["global"], $template, $matches);
 
     foreach ($matches[0] as $match) {
-      $file = preg_replace("/<!--\s+?include\s+?(.+?)\s+?-->/", "$1", $match);
+      $file = preg_replace(self::$regex["includes"]["matchr"], "$1", $match);
 
       if (strpos($file, "$") === 0) {
         $file = $variables[self::dotkey_to_objkey(str_replace("$", "", $file))]; }
@@ -138,10 +157,10 @@ class Yogurt {
 
   # Parse variables
   private static function parse_variables($template) {
-    preg_match_all("/<!--\s+?\\$\S+?\s+?-->/", $template, $matches);
+    preg_match_all(self::$regex["vars"]["global"], $template, $matches);
 
     foreach ($matches[0] as $match) {
-      $key = preg_replace("/<!--\s+?(\\$\S+?)\s+?-->/", "$1", $match);
+      $key = preg_replace(self::$regex["vars"]["matchr"], "$1", $match);
       $key = self::dotkey_to_objkey($key);
 
       $template = str_replace($match, "<?php echo $key; ?>", $template); }
