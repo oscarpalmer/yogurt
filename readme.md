@@ -2,7 +2,7 @@
 
 ## What is Yogurt?
 
-Delicious. It's also a tiny templating engine for those who don't wish to use a big and clunky -- read "awesome" -- template engine like [Twig](//github.com/fabpot/Twig).
+Delicious. It's also a tiny templating engine for those who don't wish to use a big and clunky - read "awesome" - template engine like [Twig](//github.com/fabpot/Twig).
 
 ### Why?
 
@@ -52,7 +52,7 @@ Renders `BLOCK` if the variable `$variable` exists. The second statement should 
 
 ## PHP only
 
-The `Yogurt::render()` function can take a third parameter -- `true` or `false`; `false` by default -- which allows you to bypass the parsing if your template is just PHP.
+The `Yogurt::render()` function can take a third parameter - `true` or `false`; `false` by default - which allows you to bypass the parsing if your template is just PHP.
 
 ## Errors
 
@@ -64,7 +64,7 @@ Errors are rendered "silently" as comments. Why? Because things that _can_ rende
 + JavaScript version
 + Ruby version
 
-You are -- as always -- more than welcome to suggest additions and improvements. :blush:
+You are - as always - more than welcome to suggest additions and improvements. :blush:
 
 ## Thanks to...
 
