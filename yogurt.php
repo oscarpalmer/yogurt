@@ -7,31 +7,31 @@ class Yogurt {
   private static $regex = array(
     "ifs" => array(
       "global" => array(
-        "if"     => "/<!--\s+?if[\s\S]+?endif\s+?-->/",
-        "elseif" => "/<!--\s+?else\s+?if[\s\S]+?-->/"
+        "if"     => "/(?:<!--|\{\{)\s+?if[\s\S]+?endif\s+?(?:-->|\}\})/",
+        "elseif" => "/(?:<!--|\{\{)\s+?else\s+?if[\s\S]+?(?:-->|\}\})/"
       ),
       "matchr" => array(
         "if" => array(
-          "exists"   => "/<!--\s+?if\s+?(\\$[\w\-\.]+?)\s+?-->([\s\S]+?)<!--\s+?endif\s+?-->/",
-          "operator" => "/<!--\s+?if\s+?(\\$[\w\-\.]+?)\s+?(.+?)\s+?(\\$[\w\-\.]+?|\"[\s\S]+?\")\s+?-->([\s\S]+?)<!--\s+?endif\s+?-->/"
+          "exists"   => "/(?:<!--|\{\{)\s+?if\s+?(\\$[\w\-\.]+?)\s+?(?:-->|\}\})([\s\S]+?)(?:<!--|\{\{)\s+?endif\s+?(?:-->|\}\})/",
+          "operator" => "/(?:<!--|\{\{)\s+?if\s+?(\\$[\w\-\.]+?)\s+?(.+?)\s+?(\\$[\w\-\.]+?|\"[\s\S]+?\")\s+?(?:-->|\}\})([\s\S]+?)(?:<!--|\{\{)\s+?endif\s+?(?:-->|\}\})/"
         ),
         "elseif" => array(
-          "exists"   => "/<!--\s+?else\s+?if\s+?(\\$[\w\-\.]+?)\s+?-->/",
-          "operator" => "/<!--\s+?else\s+?if\s+?(\\$[\w\-\.]+?)\s+?(.+?)\s+?(\\$[\w\-\.]+?|\"[\s\S]+?\")\s+?-->/"
+          "exists"   => "/(?:<!--|\{\{)\s+?else\s+?if\s+?(\\$[\w\-\.]+?)\s+?(?:-->|\}\})/",
+          "operator" => "/(?:<!--|\{\{)\s+?else\s+?if\s+?(\\$[\w\-\.]+?)\s+?(.+?)\s+?(\\$[\w\-\.]+?|\"[\s\S]+?\")\s+?(?:-->|\}\})/"
         )
       )
     ),
     "foreachs" => array(
-      "global" => "/<!--\s+?(\\$[\w\-\.]+?)[\s\S]+?\g{1};\s+?-->/",
-      "matchr" => "/<!--\s+?(\\$[\w\-\.]+?)\s*?:\s*?(\\$[\w\-\.]+?)\s+?-->([\s\S]+?)<!--\s+?\g{1};\s+?-->/"
+      "global" => "/(?:<!--|\{\{)\s+?(\\$[\w\-\.]+?)[\s\S]+?\g{1};\s+?(?:-->|\}\})/",
+      "matchr" => "/(?:<!--|\{\{)\s+?(\\$[\w\-\.]+?)\s*?:\s*?(\\$[\w\-\.]+?)\s+?(?:-->|\}\})([\s\S]+?)(?:<!--|\{\{)\s+?\g{1};\s+?(?:-->|\}\})/"
     ),
     "includes" => array(
-      "global" => "/<!--\s+?include\s+?.+?\s+?-->/",
-      "matchr" => "/<!--\s+?include\s+?(.+?)\s+?-->/"
+      "global" => "/(?:<!--|\{\{)\s+?include\s+?.+?\s+?(?:-->|\}\})/",
+      "matchr" => "/(?:<!--|\{\{)\s+?include\s+?(.+?)\s+?(?:-->|\}\})/"
     ),
     "vars" => array(
-      "global" => "/<!--\s+?\\$[\w\-\.]+?\s+?-->/",
-      "matchr" => "/<!--\s+?(\\$[\w\-\.]+?)\s+?-->/"
+      "global" => "/(?:<!--|\{\{)\s+?\\$[\w\-\.]+?\s+?(?:-->|\}\})/",
+      "matchr" => "/(?:<!--|\{\{)\s+?(\\$[\w\-\.]+?)\s+?(?:-->|\}\})/"
     )
   );
 
@@ -92,7 +92,7 @@ class Yogurt {
   # Parse if-statements
   private static function parse_ifs($template) {
     $template = self::parse_if_statements($template, self::$regex["ifs"]["global"], self::$regex["ifs"]["matchr"]);
-    $template = preg_replace("/<!--\s+?else\s+?-->/", "<?php else: ?>", $template);
+    $template = preg_replace("/(?:<!--|\{\{)\s+?else\s+?(?:-->|\}\})/", "<?php else: ?>", $template);
 
     return $template;
   }
