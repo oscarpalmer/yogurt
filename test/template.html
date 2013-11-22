@@ -16,13 +16,13 @@
   <!-- $not_a_variable -->
 
   <ul>
-    {{ $array : $item }}
-    <!-- if $item.title is "C" -->
+    <!-- $array : $item -->
+    <!-- if $item.title isnt "#2" -->
     <li><!-- $item.title -->; <!-- $item.body --></li>
     <!-- else -->
     <li><!-- $title -->; <!-- $item.body --></li>
     <!-- endif -->
-    {{ $array; }}
+    <!-- $array; -->
   </ul>
 
   <hr />
@@ -34,9 +34,9 @@
   </ul>
 
   <hr />
-  {{ include _partial.html }}
-  {{ include partial }}
-  {{ include $partial }}
+  <!-- include _partial.html -->
+  <!-- include partial -->
+  <!-- include $partial -->
   <hr />
 
   <!-- if $title -->
