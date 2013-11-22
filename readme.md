@@ -18,41 +18,61 @@ The best way to learn how Yogurt works is to check out the example in [test](tes
 
 ### Includes
 
-`<!-- include $variable -->`,  
 `<!-- include partial.html -->`
 
-Reads, parses, and renders the included file.
+Reads, parses, and renders the included file if the file exists.
 
 ### Foreach loops
 
-`<!-- $list : $item -->BLOCK<!-- $list; -->`
+```html
+<!-- $list : $item -->
+  <p>Loop!</p>
+<!-- $list; -->
+```
 
-Renders `BLOCK` for all direct descendants of `$list`.
+Renders the contained block for all direct descendants of `$list`.
 
 ### If-statements
 
-`<!-- if $variable is $variable -->BLOCK<!-- endif -->`,  
-`<!-- if $variable is "value" -->BLOCK<!-- endif -->`
+```html
+<!-- if $variable is $variable -->
+  <p>Yay!</p>
+<!-- endif -->
 
-Renders `BLOCK` if the statements is true.
+<!-- if $variable isnt "value" -->
+  <p>Yay?</p>
+<!-- endif -->
+```
+
+Renders the contained block if the statements is true.
 
 #### Else if
 
-`<!-- else if $variable is $variable -->BLOCK<!-- endif -->`,  
-`<!-- else if $variable is "value" -->BLOCK<!-- endif -->`
+```html
+<!-- else if $variable is $variable -->
+  <p>Yay!</p>
+<!-- endif -->
 
-Renders `BLOCK` if the statements is true and if the statement is used after a regular if or another else-if statement; see line 47-51 in [the template](test/template.html).
+<!-- else if $variable isnt "value" -->
+  <p>Yay?</p>
+<!-- endif -->
+```
+
+Renders the contained block if the statements is true and if the statement is used after a regular if or another else-if statement; see line 47-51 in [the template](test/template.html).
 
 #### If-exists
 
-`<!-- if $variable -->BLOCK<!-- endif -->`,  
-`<!-- else if $variable -->BLOCK<!-- endif -->`
+```html
+<!-- if $variable -->
+  <p>Yay!</p>
+<!-- endif -->
 
-Renders `BLOCK` if the variable `$variable` exists. The second statement should be used after a regular if or else-if statement.
+<!-- else if $variable -->
+  <p>Yay!</p>
+<!-- endif -->
+```
 
-## PHP only
-
-The `Yogurt::render()` function can take a third parameter - `true` or `false`; `false` by default - which allows you to bypass the parsing if your template is just PHP.
+Renders the contained block if the variable `$variable` exists. The second statement should be used after a regular if or else-if statement.
 
 ## Errors
 
