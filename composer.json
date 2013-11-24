@@ -1,0 +1,23 @@
+{
+  "author": [{
+    "email": "opalmer@me.com",
+    "homepage": "http://opalmer.me",
+    "name": "Oscar Palmér",
+    "role": "developer"
+  }],
+  "autoload": {
+    "files": ["yogurt.php"]
+  },
+  "description": "A tiny templating engine.",
+  "homepage": "http://git.io/yogurt",
+  "keywords": [
+    "framework",
+    "templating"
+  ],
+  "license": "MIT",
+  "name": "oscarpalmer/yogurt",
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "type": "library"
+}

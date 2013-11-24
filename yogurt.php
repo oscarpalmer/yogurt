@@ -1,6 +1,8 @@
 <?php
 
-set_error_handler("Yogurt::error_handler");
+namespace oscarpalmer;
+
+set_error_handler("oscarpalmer\Yogurt::error_handler");
 
 class Yogurt {
   # Settings for Yogurt.
@@ -136,7 +138,7 @@ class Yogurt {
 
   # Convert array to object.
   private static function array_to_object($array) {
-    $obj = new stdClass;
+    $obj = new \stdClass;
 
     foreach ($array as $key => $value) {
       if (strlen($key)) {

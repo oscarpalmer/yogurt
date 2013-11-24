@@ -6,6 +6,8 @@ $root = dirname(__FILE__);
 # Yogurt.
 require_once "$root/../yogurt.php";
 
+use oscarpalmer\Yogurt;
+
 # Uncomment to check plain output.
 #header("Content-Type: text/plain");
 
