@@ -82,6 +82,7 @@ Errors are rendered "silently" as comments. Why? Because things that _can_ rende
 
 - OOP.
 - Tests.
+- Travis and Coveralls.
 - Caching.
 - JavaScript version.
 - Ruby version.
