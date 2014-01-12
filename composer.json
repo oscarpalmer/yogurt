@@ -6,7 +6,9 @@
     "role": "developer"
   }],
   "autoload": {
-    "files": ["yogurt.php"]
+    "psr-0": {
+      "oscarpalmer\\Yogurt": ["src/"]
+    }
   },
   "description": "A tiny templating engine.",
   "homepage": "http://git.io/yogurt",
