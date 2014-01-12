@@ -80,9 +80,11 @@ Errors are rendered "silently" as comments. Why? Because things that _can_ rende
 
 ## Todo
 
-+ caching?
-+ JavaScript version
-+ Ruby version
+- OOP.
+- Tests.
+- Caching.
+- JavaScript version.
+- Ruby version.
 
 You are - as always - more than welcome to suggest additions and improvements. :blush:
 
