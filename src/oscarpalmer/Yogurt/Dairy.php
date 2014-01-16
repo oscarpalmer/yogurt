@@ -85,7 +85,7 @@ class Dairy
         foreach ($matches[0] as $match) {
             preg_match(
                 "/\A<!--\s*for\s+([\w\-]+)\s+in\s+" .
-                    static::VARIABLE_REGEX .
+                static::VARIABLE_REGEX .
                 "\s*-->(.*?)<!--\s*endfor\s*-->\z/s",
                 $match,
                 $foreach
@@ -120,21 +120,21 @@ class Dairy
             "if" => array(
                 "/<!--\s*if.*?endif\s*-->/s",
                 "/\A<!--\s*if\s*" .
-                    static::VALUE_REGEX .
-                    "\s*" .
-                    static::OPERATOR_REGEX .
-                    "\s*" .
-                    static::VALUE_REGEX .
+                static::VALUE_REGEX .
+                "\s*" .
+                static::OPERATOR_REGEX .
+                "\s*" .
+                static::VALUE_REGEX .
                 "\s*|)-->(.*?)<!--\s*endif\s*-->\z/s"
             ),
             "elseif" => array(
                 "/<!--\s*elseif.*?-->/",
                 "/\A<!--\s*elseif\s*" .
-                    static::VALUE_REGEX .
-                    "\s*" .
-                    static::OPERATOR_REGEX .
-                    "\s*" .
-                    static::VALUE_REGEX .
+                static::VALUE_REGEX .
+                "\s*" .
+                static::OPERATOR_REGEX .
+                "\s*" .
+                static::VALUE_REGEX .
                 "\s*|)-->\z/"
             )
         );

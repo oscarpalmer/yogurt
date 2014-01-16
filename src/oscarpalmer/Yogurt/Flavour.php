@@ -145,7 +145,9 @@ class Flavour
         extract($data);
         unset($data);
 
+        set_error_handler("static::errorHandler");
         eval("?>{$template}");
+        restore_error_handler();
 
         return ob_get_clean();
     }
@@ -201,5 +203,3 @@ class Flavour
         return true;
     }
 }
-
-set_error_handler("oscarpalmer\Yogurt\Flavour::errorHandler");
