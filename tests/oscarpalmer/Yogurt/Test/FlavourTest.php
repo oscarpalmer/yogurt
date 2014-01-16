@@ -133,7 +133,8 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
     {
         # Needed because the error handler only handles Flavour's errors.
         $flavour = $this->mock_flavour;
-        $flavour_file = (new \ReflectionClass(get_class($flavour)))->getFilename();
+        $flavour_class = new \ReflectionClass(get_class($flavour));
+        $flavour_file = $flavour_class->getFilename();
 
         # Custom error.
         $error = Flavour::errorHandler(0, "Error handler", $flavour_file, 1, array());
