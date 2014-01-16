@@ -87,14 +87,18 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
         $yogurt->setDirectory($dir);
 
+        $settings = $yogurt->getSettings();
+
         # Newly set directory was successfully set.
-        $this->assertSame($dir, $yogurt->getSettings()["directory"]);
+        $this->assertSame($dir, $settings["directory"]);
     }
 
     public function testSetDirectoryError()
     {
         $yogurt = $this->mock_yogurt;
-        $old_dir = $yogurt->getSettings()["directory"];
+        $settings = $yogurt->getSettings();
+
+        $old_dir = $settings["directory"];
 
         # Mock and invalid variables.
         $dir_1 = 1234;
@@ -110,7 +114,9 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->assertSame($old_dir, $yogurt->getSettings()["directory"]);
+        $settings = $yogurt->getSettings();
+
+        $this->assertSame($old_dir, $settings["directory"]);
     }
 
     public function testSetExtension()
@@ -121,14 +127,18 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
         $yogurt->setExtension($ext);
 
+        $settings = $yogurt->getSettings();
+
         # Newly set directory was successfully set.
-        $this->assertSame($ext, $yogurt->getSettings()["extension"]);
+        $this->assertSame($ext, $settings["extension"]);
     }
 
     public function testSetExtensionError()
     {
         $yogurt = $this->mock_yogurt;
-        $old_ext = $yogurt->getSettings()["extension"];
+        $settings = $yogurt->getSettings();
+
+        $old_ext = $settings["extension"];
 
         try {
             $yogurt->setExtension(1234); # Invalid extension name.
@@ -138,6 +148,8 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf("Exception", $e);
         }
 
-        $this->assertSame($old_ext, $yogurt->getSettings()["extension"]);
+        $settings = $yogurt->getSettings();
+
+        $this->assertSame($old_ext, $settings["extension"]);
     }
 }
