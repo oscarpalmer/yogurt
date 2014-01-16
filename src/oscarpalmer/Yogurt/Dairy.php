@@ -233,8 +233,10 @@ class Dairy
      */
     public static function displaySyntaxErrorMessage(\Exception $exception, $filename)
     {
-        $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\"><p><b>Error!</b></p>";
-        $middle = "<p>The syntax below is invalid and can be found in the template file <code>{$filename}</code>.</p>";
+        $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\">";
+        $prefix .= "<p><b>Error!</b></p>";
+        $middle = "<p>The syntax below is invalid and can be found in the template file";
+        $middle .= " <code>{$filename}</code>.</p>";
 
         $suffix = $exception->getMessage();
         $suffix = preg_replace("/>\s+</", ">\n<", $suffix);
