@@ -2,8 +2,11 @@
 
 namespace oscarpalmer\Yogurt;
 
-set_error_handler("oscarpalmer\\Yogurt\\Flavour::errorHandler");
+set_error_handler("oscarpalmer\Yogurt\Flavour::errorHandler");
 
+/**
+ * Flavour, the template object.
+ */
 class Flavour
 {
     /**

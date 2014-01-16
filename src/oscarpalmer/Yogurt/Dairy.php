@@ -2,8 +2,21 @@
 
 namespace oscarpalmer\Yogurt;
 
+/**
+ * Dairy, the parser.
+ */
 class Dairy
 {
+    /**
+     * Useful regex snippets.
+     *
+     * @access public
+     * @const string
+     */
+    const OPERATOR_REGEX = "(?:(={2,3}|!={1,2}|>=|<=|<>|>|<|is|isnt)";
+    const VALUE_REGEX = "([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)";
+    const VARIABLE_REGEX = "([\w\-\.\{\}]+)";
+
     /**
      * Filename of template.
      *
@@ -70,7 +83,13 @@ class Dairy
         preg_match_all("/<!--\s*for.*?endfor\s*-->/s", $template, $matches);
 
         foreach ($matches[0] as $match) {
-            preg_match("/\A<!--\s*for\s+([\w\-]+)\s+in\s+([\w\-\.\{\}]+)\s*-->(.*?)<!--\s*endfor\s*-->\z/s", $match, $foreach);
+            preg_match(
+                "/\A<!--\s*for\s+([\w\-]+)\s+in\s+" .
+                    static::VARIABLE_REGEX .
+                "\s*-->(.*?)<!--\s*endfor\s*-->\z/s",
+                $match,
+                $foreach
+            );
 
             if (empty($foreach)) {
                 throw new \LogicException($match);
@@ -78,7 +97,9 @@ class Dairy
 
             $array = static::getObjectKey($foreach[2]);
 
-            $template = str_replace($match, "<?php foreach({$array} as \${$foreach[1]}): ?>{$foreach[3]}<?php endforeach; ?>", $template);
+            $replacement = "<?php foreach({$array} as \${$foreach[1]}): ?>{$foreach[3]}<?php endforeach; ?>";
+
+            $template = str_replace($match, $replacement, $template);
         }
 
         return $template;
@@ -98,11 +119,23 @@ class Dairy
         $regex = array(
             "if" => array(
                 "/<!--\s*if.*?endif\s*-->/s",
-                "/\A<!--\s*if\s*([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)\s*(?:(={2,3}|!={1,2}|>=|<=|<>|>|<|is|isnt)\s*([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)\s*|)-->(.*?)<!--\s*endif\s*-->\z/s"
+                "/\A<!--\s*if\s*" .
+                    static::VALUE_REGEX .
+                    "\s*" .
+                    static::OPERATOR_REGEX .
+                    "\s*" .
+                    static::VALUE_REGEX .
+                "\s*|)-->(.*?)<!--\s*endif\s*-->\z/s"
             ),
             "elseif" => array(
                 "/<!--\s*elseif.*?-->/",
-                "/\A<!--\s*elseif\s*([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)\s*(?:(={2,3}|!={1,2}|>=|<=|<>|>|<|is|isnt)\s*([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)\s*|)-->\z/"
+                "/\A<!--\s*elseif\s*" .
+                    static::VALUE_REGEX .
+                    "\s*" .
+                    static::OPERATOR_REGEX .
+                    "\s*" .
+                    static::VALUE_REGEX .
+                "\s*|)-->\z/"
             )
         );
 
@@ -178,7 +211,7 @@ class Dairy
      */
     public function parseVariables($template)
     {
-        preg_match_all("/<!--\s*([\w\-\.\{\}]+)\s*-->/", $template, $matches);
+        preg_match_all("/<!--\s*" . static::VARIABLE_REGEX . "\s*-->/", $template, $matches);
 
         foreach ($matches[0] as $index => $variable) {
             $var = static::getObjectKey($matches[1][$index]);

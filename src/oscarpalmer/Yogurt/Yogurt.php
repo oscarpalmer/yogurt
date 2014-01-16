@@ -5,10 +5,13 @@ namespace oscarpalmer\Yogurt;
 use oscarpalmer\Yogurt\Dairy;
 use oscarpalmer\Yogurt\Flavour;
 
+/**
+ * Yogurt, the main engine.
+ */
 class Yogurt
 {
     /**
-     * Dairy, our parser.
+     * Dairy, the parser.
      *
      * @access public
      */
@@ -55,7 +58,7 @@ class Yogurt
     }
 
     /**
-     * Get Dairy, our parser.
+     * Get Dairy, the parser.
      *
      * @access public
      * @return Dairy The parser object.
