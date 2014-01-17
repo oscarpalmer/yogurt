@@ -7,7 +7,7 @@
   }],
   "autoload": {
     "psr-0": {
-      "oscarpalmer\\Yogurt": ["src/"]
+      "oscarpalmer\\Yogurt": ["src/", "tests/"]
     }
   },
   "description": "A tiny templating engine.",
@@ -19,7 +19,10 @@
   "license": "MIT",
   "name": "oscarpalmer/yogurt",
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=5.3.0"
+  },
+  "require-dev": {
+    "league/phpunit-coverage-listener": "~1.1"
   },
   "type": "library"
 }

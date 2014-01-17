@@ -1,94 +1,100 @@
 # Yogurt
 
-## What is Yogurt?
+[![Build Status](https://travis-ci.org/oscarpalmer/yogurt.png?branch=master)](https://travis-ci.org/oscarpalmer/yogurt) [![Coverage Status](https://coveralls.io/repos/oscarpalmer/yogurt/badge.png)](https://coveralls.io/r/oscarpalmer/yogurt)
 
-Delicious. It's also a tiny templating engine for those who don't wish to use a big and clunky - read "awesome" - template engine like [Twig](//github.com/fabpot/Twig).
+Yogurt is a template language for PHP inspired by [Riot's](http://riothq.com) [Hammer](http://hammerformac.com). Hammer's syntax was based on regular ol' HTML comment tags, so you won't have to install another syntax highlighter for your editor. Nice, huh?
 
-### Why?
+## Installation
 
-Like I said, I disliked adding Twig to every little project that used templates. Twig is great, but it rarely fits the scope of my projects.
+Yogurt is available via Composer and works with PHP `>=5.3`.
 
-## How?
+```json
+{
+  "require": {
+    "oscarpalmer/yogurt": "dev-master"
+  }
+}
+```
 
-The best way to learn how Yogurt works is to check out the example in [test](test). But if you want, you can read about the various Yogurt tags below and how they work.
+## Getting started
+
+```php
+$yogurt = new Yogurt("./directory/for/templates", "template-extension");
+
+$flavour = $yogurt->flavour("my-template");
+# Or $flavour = new Flavour($yogurt, "my-template");
+
+$flavour->data(array(
+  "title" => "My Title"
+));
+
+echo $flavour->taste();
+# Or just echo $flavour;
+```
+
+## Syntax
+
+The syntax is based on regular HTML comments and the control structures (`if` and `foreach`) are based on [Twig's](//github.com/fabpot/Twig) syntax, so it shouldn't be too difficult to learn.
 
 ### Variables
 
-`<!-- $variable -->`; renders the value of `$variable`.
-
-### Includes
-
-`<!-- include partial.html -->`
-
-Reads, parses, and renders the included file if the file exists.
-
-### Foreach loops
-
 ```html
-<!-- $list : $item -->
-  <p>Loop!</p>
-<!-- $list; -->
+<p><!-- variable --></p>
+<p><!-- chaining.variables.works.too --></p>
 ```
 
-Renders the contained block for all direct descendants of `$list`.
+`variable` is a direct child of the data array (`$flavour->data();`), and the `chaining.variables.works.too` is a nested child of multiple arrays inside the data array.
 
-### If-statements
+Variables _should_ be of the `scalar` type, i.e. `boolean`, `float`, `integer`, or `string`. If not, PHP will scream.
+
+### Including other files
 
 ```html
-<!-- if $variable is $variable -->
-  <p>Yay!</p>
-<!-- endif -->
-
-<!-- if $variable isnt "value" -->
-  <p>Yay?</p>
-<!-- endif -->
+<!-- include file.html -->
+<!-- include file -->
 ```
 
-Renders the contained block if the statements is true.
+Yogurt will then attempt to find the file in the directory supplied to Yogurt as shown in the ["Getting started" example](#getting-started); the second one will automatically append the supplied file extension.
 
-#### Else if
+### Looping
 
 ```html
-<!-- else if $variable is $variable -->
-  <p>Yay!</p>
-<!-- endif -->
-
-<!-- else if $variable isnt "value" -->
-  <p>Yay?</p>
-<!-- endif -->
+<!-- for item in items -->
+<p><!-- item --></p>
+<!-- endfor -->
 ```
 
-Renders the contained block if the statements is true and if the statement is used after a regular if or another else-if statement; see line 47-51 in [the template](test/template.html).
+`items` _should_ be an array, but `item` can be whatever; just remember to chain names to access the item's children if it isn't `scalar`, like this: `item.title`.
 
-#### If-exists
+### Ifs and else-ifs
 
 ```html
-<!-- if $variable -->
-  <p>Yay!</p>
+<!-- if title -->
+<p>Title exists.</p>
 <!-- endif -->
 
-<!-- else if $variable -->
-  <p>Yay!</p>
+<!-- if page is "some-page" -->
+<p>Page is "some-page".</p>
+<!-- elseif number === 1234 -->
+<p>Number is "1234".</p>
+<!-- else -->
+<p>This is pretty cool.</p>
 <!-- endif -->
 ```
 
-Renders the contained block if the variable `$variable` exists. The second statement should be used after a regular if or else-if statement.
+Supported comparison operators are `===`, `==`, `!==`, `!=`, `>=`, `<=`, `<>`, `>`, `<`, `is`, and `isnt`. `is` and `isnt` will be turned into `==` and `!=` respectively.
 
-## Errors
+Values can be `scalar`, `null`, or variables. `boolean`, `float`, `integer`, and `null` values can be wrapped in quotation marks, but don't necessarily need them.
 
-Errors are rendered "silently" as comments. Why? Because things that _can_ render _should_ render.
+Strings however, do need quotation marks; if they're not wrapped in quotation marks, they're assumed to be variables.
 
 ## Todo
 
-- OOP.
-- Tests.
-- Travis and Coveralls.
 - Caching.
-- JavaScript version.
-- Ruby version.
+- Remove plain PHP.
+- Including variables.
+- Other languages?
 
-You are - as always - more than welcome to suggest additions and improvements. :blush:
+## Licence
 
-## Thanks to...
-
-... [Riot](http://riothq.com/) for making [Hammer](http://hammerformac.com/) where the inspiration for the syntax came. I'm using Hammer daily for my static experiments and hacks, and it's the best way to build simple static sites.
+Copyright (c) 2014 Oscar Palmér. MIT Licensed.

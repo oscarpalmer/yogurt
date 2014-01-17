@@ -4,51 +4,35 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="initial-scale=1" />
-  <title><!-- $title --></title>
+  <title><!-- title --></title>
 </head>
 <body>
-  <h1><!-- $title --></h1>
-  <p><!-- $tag --></p>
+  <h1><!-- title --></h1>
+  <p><!-- tag --></p>
 
   <hr />
 
-  <!-- $body -->
-  <!-- $not_a_variable -->
+  <!-- body -->
+
+  <hr />
 
   <ul>
-    <!-- $array : $item -->
-    <!-- if $item.title isnt "#2" -->
-    <li><!-- $item.title -->; <!-- $item.body --></li>
-    <!-- else -->
-    <li><!-- $title -->; <!-- $item.body --></li>
-    <!-- endif -->
-    <!-- $array; -->
+    <!-- for item in items -->
+    <li><!-- item.title -->; <!-- item.body --></li>
+    <!-- endfor -->
   </ul>
 
   <hr />
-  
-  <ul>
-    <!-- $not_an_array : $item -->
-    <li><!-- $item.title -->; <!-- $item.body --></li>
-    <!-- $not_an_array; -->
-  </ul>
+
+  <!-- include _partial -->
 
   <hr />
-  <!-- include _partial.html -->
-  <!-- include partial -->
-  <!-- include $partial -->
-  <hr />
 
-  <!-- if $title -->
-  <p><!-- $title --></p>
-  <!-- endif -->
-
-  <hr />
-  <!-- if $title is "Yogurt" -->
-  <h2>Yogurt</h2>
-  <!-- else if $title is "Yeahgurt" -->
-  <h2>Yeahgurt</h2>
+  <!-- if title is "Yogurt" -->
+  <h2>Yogurt!</h2>
+  <!-- elseif title is "Yeahgurt" -->
+  <h2>Yeahgurt!</h2>
   <!-- endif -->
   </ul>
 </body>
-</html> 
+</html>
