@@ -30,110 +30,107 @@
         <h1>
 <a name="yogurt" class="anchor" href="#yogurt"><span class="octicon octicon-link"></span></a>Yogurt</h1>
 
-<h2>
-<a name="what-is-yogurt" class="anchor" href="#what-is-yogurt"><span class="octicon octicon-link"></span></a>What is Yogurt?</h2>
+<p><a href="https://travis-ci.org/oscarpalmer/yogurt"><img src="https://travis-ci.org/oscarpalmer/yogurt.png?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/r/oscarpalmer/yogurt"><img src="https://coveralls.io/repos/oscarpalmer/yogurt/badge.png" alt="Coverage Status"></a></p>
 
-<p>Delicious. It's also a tiny templating engine for those who don't wish to use a big and clunky - read "awesome" - template engine like <a href="//github.com/fabpot/Twig">Twig</a>.</p>
-
-<h3>
-<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h3>
-
-<p>Like I said, I disliked adding Twig to every little project that used templates. Twig is great, but it rarely fits the scope of my projects.</p>
+<p>Yogurt is a template language for PHP inspired by <a href="http://riothq.com">Riot's</a> <a href="http://hammerformac.com">Hammer</a>. Hammer's syntax was based on regular ol' HTML comment tags, so you won't have to install another syntax highlighter for your editor. Nice, huh?</p>
 
 <h2>
-<a name="how" class="anchor" href="#how"><span class="octicon octicon-link"></span></a>How?</h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>The best way to learn how Yogurt works is to check out the example in <a href="test">test</a>. But if you want, you can read about the various Yogurt tags below and how they work.</p>
+<p>Yogurt is available via Composer and works with PHP <code>&gt;=5.3</code>.</p>
+
+<div class="highlight highlight-json"><pre><span class="p">{</span>
+  <span class="nt">"require"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">"oscarpalmer/yogurt"</span><span class="p">:</span> <span class="s2">"dev-master"</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
 <h2>
-<a name="composer" class="anchor" href="#composer"><span class="octicon octicon-link"></span></a>Composer?</h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
 
-<p>Yes, Yogurt is available via Composer on Packagist, but it's not required to use it; you can just require it as you would a regular file.</p>
+<div class="highlight highlight-php"><pre><span class="nv">$yogurt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Yogurt</span><span class="p">(</span><span class="s2">"./directory/for/templates"</span><span class="p">,</span> <span class="s2">"template-extension"</span><span class="p">);</span>
 
-<p>The only boring thing you'll need to do before the templating can begin is to tell your script to use Yogurt, like this: <code>use oscarpalmer\Yogurt;</code> or <code>use oscarpalmer\Yogurt as Delicious;</code> for a different name.</p>
+<span class="nv">$flavour</span> <span class="o">=</span> <span class="nv">$yogurt</span><span class="o">-&gt;</span><span class="na">flavour</span><span class="p">(</span><span class="s2">"my-template"</span><span class="p">);</span>
+<span class="c1"># Or $flavour = new Flavour($yogurt, "my-template");</span>
+
+<span class="nv">$flavour</span><span class="o">-&gt;</span><span class="na">data</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+  <span class="s2">"title"</span> <span class="o">=&gt;</span> <span class="s2">"My Title"</span>
+<span class="p">));</span>
+
+<span class="k">echo</span> <span class="nv">$flavour</span><span class="o">-&gt;</span><span class="na">taste</span><span class="p">();</span>
+<span class="c1"># Or just echo $flavour;</span>
+</pre></div>
+
+<h2>
+<a name="syntax" class="anchor" href="#syntax"><span class="octicon octicon-link"></span></a>Syntax</h2>
+
+<p>The syntax is based on regular HTML comments and the control structures (<code>if</code> and <code>foreach</code>) are based on <a href="//github.com/fabpot/Twig">Twig's</a> syntax, so it shouldn't be too difficult to learn.</p>
 
 <h3>
 <a name="variables" class="anchor" href="#variables"><span class="octicon octicon-link"></span></a>Variables</h3>
 
-<p><code>&lt;!-- $variable --&gt;</code>; renders the value of <code>$variable</code>.</p>
+<div class="highlight highlight-html"><pre><span class="nt">&lt;p&gt;</span><span class="c">&lt;!-- variable --&gt;</span><span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;p&gt;</span><span class="c">&lt;!-- chaining.variables.works.too --&gt;</span><span class="nt">&lt;/p&gt;</span>
+</pre></div>
+
+<p><code>variable</code> is a direct child of the data array (<code>$flavour-&gt;data();</code>), and the <code>chaining.variables.works.too</code> is a nested child of multiple arrays inside the data array.</p>
+
+<p>Variables <em>should</em> be of the <code>scalar</code> type, i.e. <code>boolean</code>, <code>float</code>, <code>integer</code>, or <code>string</code>. If not, PHP will scream.</p>
 
 <h3>
-<a name="includes" class="anchor" href="#includes"><span class="octicon octicon-link"></span></a>Includes</h3>
+<a name="including-other-files" class="anchor" href="#including-other-files"><span class="octicon octicon-link"></span></a>Including other files</h3>
 
-<p><code>&lt;!-- include partial.html --&gt;</code></p>
+<div class="highlight highlight-html"><pre><span class="c">&lt;!-- include file.html --&gt;</span>
+<span class="c">&lt;!-- include file --&gt;</span>
+</pre></div>
 
-<p>Reads, parses, and renders the included file if the file exists.</p>
+<p>Yogurt will then attempt to find the file in the directory supplied to Yogurt as shown in the <a href="#getting-started">"Getting started" example</a>; the second one will automatically append the supplied file extension.</p>
 
 <h3>
-<a name="foreach-loops" class="anchor" href="#foreach-loops"><span class="octicon octicon-link"></span></a>Foreach loops</h3>
+<a name="looping" class="anchor" href="#looping"><span class="octicon octicon-link"></span></a>Looping</h3>
 
-<div class="highlight highlight-html"><pre><span class="c">&lt;!-- $list : $item --&gt;</span>
-  <span class="nt">&lt;p&gt;</span>Loop!<span class="nt">&lt;/p&gt;</span>
-<span class="c">&lt;!-- $list; --&gt;</span>
+<div class="highlight highlight-html"><pre><span class="c">&lt;!-- for item in items --&gt;</span>
+<span class="nt">&lt;p&gt;</span><span class="c">&lt;!-- item --&gt;</span><span class="nt">&lt;/p&gt;</span>
+<span class="c">&lt;!-- endfor --&gt;</span>
 </pre></div>
 
-<p>Renders the contained block for all direct descendants of <code>$list</code>.</p>
+<p><code>items</code> <em>should</em> be an array, but <code>item</code> can be whatever; just remember to chain names to access the item's children if it isn't <code>scalar</code>, like this: <code>item.title</code>.</p>
 
 <h3>
-<a name="if-statements" class="anchor" href="#if-statements"><span class="octicon octicon-link"></span></a>If-statements</h3>
+<a name="ifs-and-else-ifs" class="anchor" href="#ifs-and-else-ifs"><span class="octicon octicon-link"></span></a>Ifs and else-ifs</h3>
 
-<div class="highlight highlight-html"><pre><span class="c">&lt;!-- if $variable is $variable --&gt;</span>
-  <span class="nt">&lt;p&gt;</span>Yay!<span class="nt">&lt;/p&gt;</span>
+<div class="highlight highlight-html"><pre><span class="c">&lt;!-- if title --&gt;</span>
+<span class="nt">&lt;p&gt;</span>Title exists.<span class="nt">&lt;/p&gt;</span>
 <span class="c">&lt;!-- endif --&gt;</span>
 
-<span class="c">&lt;!-- if $variable isnt "value" --&gt;</span>
-  <span class="nt">&lt;p&gt;</span>Yay?<span class="nt">&lt;/p&gt;</span>
-<span class="c">&lt;!-- endif --&gt;</span>
-</pre></div>
-
-<p>Renders the contained block if the statements is true.</p>
-
-<h4>
-<a name="else-if" class="anchor" href="#else-if"><span class="octicon octicon-link"></span></a>Else if</h4>
-
-<div class="highlight highlight-html"><pre><span class="c">&lt;!-- else if $variable is $variable --&gt;</span>
-  <span class="nt">&lt;p&gt;</span>Yay!<span class="nt">&lt;/p&gt;</span>
-<span class="c">&lt;!-- endif --&gt;</span>
-
-<span class="c">&lt;!-- else if $variable isnt "value" --&gt;</span>
-  <span class="nt">&lt;p&gt;</span>Yay?<span class="nt">&lt;/p&gt;</span>
+<span class="c">&lt;!-- if page is "some-page" --&gt;</span>
+<span class="nt">&lt;p&gt;</span>Page is "some-page".<span class="nt">&lt;/p&gt;</span>
+<span class="c">&lt;!-- elseif number === 1234 --&gt;</span>
+<span class="nt">&lt;p&gt;</span>Number is "1234".<span class="nt">&lt;/p&gt;</span>
+<span class="c">&lt;!-- else --&gt;</span>
+<span class="nt">&lt;p&gt;</span>This is pretty cool.<span class="nt">&lt;/p&gt;</span>
 <span class="c">&lt;!-- endif --&gt;</span>
 </pre></div>
 
-<p>Renders the contained block if the statements is true and if the statement is used after a regular if or another else-if statement; see line 47-51 in <a href="test/template.html">the template</a>.</p>
+<p>Supported comparison operators are <code>===</code>, <code>==</code>, <code>!==</code>, <code>!=</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>&lt;&gt;</code>, <code>&gt;</code>, <code>&lt;</code>, <code>is</code>, and <code>isnt</code>. <code>is</code> and <code>isnt</code> will be turned into <code>==</code> and <code>!=</code> respectively.</p>
 
-<h4>
-<a name="if-exists" class="anchor" href="#if-exists"><span class="octicon octicon-link"></span></a>If-exists</h4>
+<p>Values can be <code>scalar</code>, <code>null</code>, or variables. <code>boolean</code>, <code>float</code>, <code>integer</code>, and <code>null</code> values can be wrapped in quotation marks, but don't necessarily need them.</p>
 
-<div class="highlight highlight-html"><pre><span class="c">&lt;!-- if $variable --&gt;</span>
-  <span class="nt">&lt;p&gt;</span>Yay!<span class="nt">&lt;/p&gt;</span>
-<span class="c">&lt;!-- endif --&gt;</span>
-
-<span class="c">&lt;!-- else if $variable --&gt;</span>
-  <span class="nt">&lt;p&gt;</span>Yay!<span class="nt">&lt;/p&gt;</span>
-<span class="c">&lt;!-- endif --&gt;</span>
-</pre></div>
-
-<p>Renders the contained block if the variable <code>$variable</code> exists. The second statement should be used after a regular if or else-if statement.</p>
-
-<h2>
-<a name="errors" class="anchor" href="#errors"><span class="octicon octicon-link"></span></a>Errors</h2>
-
-<p>Errors are rendered "silently" as comments. Why? Because things that <em>can</em> render <em>should</em> render.</p>
+<p>Strings however, do need quotation marks; if they're not wrapped in quotation marks, they're assumed to be variables.</p>
 
 <h2>
 <a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>Todo</h2>
 
 <ul>
-<li>caching?</li>
-<li>JavaScript version</li>
-<li>Ruby version</li>
-</ul><p>You are - as always - more than welcome to suggest additions and improvements. <img class="emoji" title=":blush:" alt=":blush:" src="https://github.global.ssl.fastly.net/images/icons/emoji/blush.png" height="20" width="20" align="absmiddle"></p>
+<li>Caching.</li>
+<li>Remove plain PHP.</li>
+<li>Including variables.</li>
+<li>Other languages?</li>
+</ul><h2>
+<a name="licence" class="anchor" href="#licence"><span class="octicon octicon-link"></span></a>Licence</h2>
 
-<h2>
-<a name="thanks-to" class="anchor" href="#thanks-to"><span class="octicon octicon-link"></span></a>Thanks to...</h2>
-
-<p>... <a href="http://riothq.com/">Riot</a> for making <a href="http://hammerformac.com/">Hammer</a> where the inspiration for the syntax came. I'm using Hammer daily for my static experiments and hacks, and it's the best way to build simple static sites.</p>
+<p>Copyright (c) 2014 Oscar Palmér. MIT Licensed.</p>
       </section>
     </div>
     <footer>
