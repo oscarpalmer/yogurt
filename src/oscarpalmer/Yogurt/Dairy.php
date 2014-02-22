@@ -8,35 +8,25 @@ namespace oscarpalmer\Yogurt;
 class Dairy
 {
     /**
-     * Useful regex snippets.
-     *
-     * @access public
-     * @const string
+     * @var string Useful regex snippets.
      */
     const OPERATOR_REGEX = "(?:(={2,3}|!={1,2}|>=|<=|<>|>|<|is|isnt)";
     const VALUE_REGEX = "([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)";
     const VARIABLE_REGEX = "([\w\-\.\{\}]+)";
 
     /**
-     * Filename of template.
-     *
-     * @access public
+     * @var string Filename of template.
      */
     protected $filename = "unknown template";
 
     /**
-     * Settings for Dairy.
-     *
-     * @access public
+     * @var array Settings for Dairy.
      */
     protected $settings;
 
     /**
-     * Constructor.
-     *
      * Create a new Dairy (parser).
      *
-     * @access public
      * @param array $settings Settings; usually from Yogurt.
      */
     public function __construct(array $settings)
@@ -44,10 +34,11 @@ class Dairy
         $this->settings = $settings;
     }
 
+    /** Public functions. */
+
     /**
      * Parse a template.
      *
-     * @access public
      * @param  string  $filename      Filename for template.
      * @param  boolean $save_filename Save filename in object? Default is true; false if parsing included content.
      * @return string  Parsed template.
@@ -74,7 +65,6 @@ class Dairy
     /**
      * Parse foreach-statements.
      *
-     * @access public
      * @param  string $template Template to parse.
      * @return string Parsed template.
      */
@@ -108,7 +98,6 @@ class Dairy
     /**
      * Parse if-statements.
      *
-     * @access public
      * @param  string $template Template to parse.
      * @return string Parsed template.
      */
@@ -172,7 +161,6 @@ class Dairy
     /**
      * Parse includes and their included content.
      *
-     * @access public
      * @param  string $template Template to parse.
      * @return string Parsed template.
      */
@@ -205,7 +193,6 @@ class Dairy
     /**
      * Parse variables.
      *
-     * @access public
      * @param  string $template Template to parse.
      * @return string Parsed template.
      */
@@ -227,7 +214,6 @@ class Dairy
     /**
      * Display a syntax error message.
      *
-     * @access public
      * @param Exception $exception Thrown exception.
      * @param string    $filename  Filename for template in which the error was found.
      */
@@ -249,7 +235,6 @@ class Dairy
     /**
      * Get object-key name from regular key.
      *
-     * @access public
      * @param  string $key Key to convert.
      * @return string Converted key.
      */
@@ -264,7 +249,6 @@ class Dairy
     /**
      * Get comparison operator.
      *
-     * @access public
      * @param  string $operator Operator to fix.
      * @return string Fixed operator.
      */
@@ -284,7 +268,6 @@ class Dairy
     /**
      * Get "raw" value.
      *
-     * @access public
      * @param  string $value Value to convert.
      * @return string Raw value.
      */

@@ -8,32 +8,23 @@ namespace oscarpalmer\Yogurt;
 class Flavour
 {
     /**
-     * Data to render.
-     *
-     * @access public
+     * @var array Data to render.
      */
     protected $data = array();
 
     /**
-     * Filename for template.
-     *
-     * @access public
+     * @var string Filename for template.
      */
     protected $filename;
 
     /**
-     * Our Yogurt.
-     *
-     * @access public
+     * @var Yogurt Our Yogurt.
      */
     protected $yogurt;
 
     /**
-     * Constructor.
-     *
      * Create a new Flavour with Yogurt and flavour name.
      *
-     * @access public
      * @param Yogurt $yogurt Yogurt for settings and parsing.
      * @param string $name   Flavour (template) name.
      */
@@ -46,18 +37,17 @@ class Flavour
 
     /**
      * Return rendered template on direct access of Flavour object.
-     *
-     * @access public
      */
     public function __toString()
     {
         return $this->taste();
     }
 
+    /** Public functions. */
+
     /**
      * Add data to flavour.
      *
-     * @access public
      * @param  array $data Data to add.
      * @return array All the data.
      */
@@ -75,7 +65,6 @@ class Flavour
     /**
      * Array to object and then object to associative array.
      *
-     * @access public
      * @return array Array of data.
      */
     public function getDataObject()
@@ -90,7 +79,6 @@ class Flavour
     /**
      * Get current filename.
      *
-     * @access public
      * @return string Filename.
      */
     public function getFilename()
@@ -101,7 +89,6 @@ class Flavour
     /**
      * Set the filename.
      *
-     * @access public
      * @param string $name Filename to set.
      */
     public function setFilename($name)
@@ -129,7 +116,6 @@ class Flavour
     /**
      * Render the template.
      *
-     * @access public
      * @param  array  $data More data to add.
      * @return string The rendered template.
      */
@@ -157,7 +143,6 @@ class Flavour
     /**
      * Convert array to object.
      *
-     * @access public
      * @param  array  $array Array to convert.
      * @return object Converted array.
      */
@@ -181,7 +166,6 @@ class Flavour
     /**
      * Handle errors for the eval-function. Passes on the error if it's not a local error.
      *
-     * @access public
      * @param  int     $number    Error level.
      * @param  string  $string    Error message.
      * @param  string  $file      Error file.

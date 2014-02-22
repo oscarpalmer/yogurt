@@ -2,34 +2,24 @@
 
 namespace oscarpalmer\Yogurt;
 
-use oscarpalmer\Yogurt\Dairy;
-use oscarpalmer\Yogurt\Flavour;
-
 /**
  * Yogurt, the main engine.
  */
 class Yogurt
 {
     /**
-     * Dairy, the parser.
-     *
-     * @access public
+     * @var Dairy Dairy, the parser.
      */
     protected $dairy;
 
     /**
-     * Settings for Yogurt.
-     *
-     * @access public
+     * @var array Settings for Yogurt.
      */
     protected $settings;
 
     /**
-     * Constructor.
-     *
      * Create new Yogurt.
      *
-     * @access public
      * @param string $directory Valid directory name.
      * @param string $extension Extension name.
      */
@@ -41,10 +31,11 @@ class Yogurt
         $this->dairy = new Dairy($this->settings);
     }
 
+    /** Public functions. */
+
     /**
      * Create a new flavour (template).
      *
-     * @access public
      * @param  string  $flavour Name of flavour.
      * @return Flavour Our new flavour.
      */
@@ -60,7 +51,6 @@ class Yogurt
     /**
      * Get Dairy, the parser.
      *
-     * @access public
      * @return Dairy The parser object.
      */
     public function getDairy()
@@ -71,8 +61,7 @@ class Yogurt
     /**
      * Get the settings for Yogurt.
      *
-     * @access public
-     * @return array Settings.
+     * @return array Array of Settings.
      */
     public function getSettings()
     {
@@ -82,8 +71,8 @@ class Yogurt
     /**
      * Set directory.
      *
-     * @access public
-     * @param string $directory Valid directory name.
+     * @param  string $directory Valid directory name.
+     * @return Yogurt Yogurt object for optional chaining.
      */
     public function setDirectory($directory)
     {
@@ -109,8 +98,8 @@ class Yogurt
     /**
      * Set extension name.
      *
-     * @access public
-     * @param string $extension Extension name.
+     * @param  string $extension Extension name.
+     * @return Yogurt Yogurt object for optional chaining.
      */
     public function setExtension($extension)
     {
