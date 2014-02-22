@@ -91,8 +91,7 @@ Strings however, do need quotation marks; if they're not wrapped in quotation ma
 ## Todo
 
 - Caching.
-- Remove plain PHP.
-- Including variables.
+- Including variables; i.e. a filename stored as a variable.
 - Other languages?
 
 ## Licence

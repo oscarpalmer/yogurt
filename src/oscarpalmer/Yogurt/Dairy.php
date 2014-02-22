@@ -51,6 +51,8 @@ class Dairy
 
         try {
             $template = file_get_contents($filename);
+            $template = preg_replace("/<\?php.*?\?>/", "", $template);
+
             $template = $this->parseForeachs($template);
             $template = $this->parseIfs($template);
             $template = $this->parseIncludes($template);
