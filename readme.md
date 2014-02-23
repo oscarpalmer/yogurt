@@ -94,6 +94,6 @@ Strings however, do need quotation marks; if they're not wrapped in quotation ma
 - Including variables; i.e. a filename stored as a variable.
 - Other languages?
 
-## Licence
+## License
 
-Copyright (c) 2014 Oscar Palmér. MIT Licensed.
+MIT Licensed; see [the LICENSE file](LICENSE) for more info.
