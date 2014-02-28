@@ -9,21 +9,19 @@ use oscarpalmer\Yogurt\Yogurt;
 class YogurtTest extends \PHPUnit_Framework_TestCase
 {
     # Mock variables.
-    protected $mock_directory;
-    protected $mock_yogurt;
+    protected $directory;
+    protected $yogurt;
 
     public function setUp()
     {
-        # Valid directory.
-        $this->mock_directory = __DIR__ . "/../../../assets";
+        $this->directory = __DIR__ . "/../../../assets";
 
-        # Mock Yogurt with mock settings.
-        $this->mock_yogurt = new Yogurt($this->mock_directory);
+        $this->yogurt = new Yogurt($this->directory);
     }
 
     public function testConstructor()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
 
         # Proper Yogurt object.
         $this->assertNotNull($yogurt);
@@ -32,7 +30,7 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
     public function testFlavour()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
 
         $flavour = $yogurt->flavour("simple");
 
@@ -43,9 +41,8 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
     public function testFlavourError()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
 
-        # Mock and invalid variables.
         $flavour_1 = 1234;
         $flavour_2 = "not_a_flavour";
 
@@ -62,7 +59,7 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDairy()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
 
         # Proper Dairy object.
         $this->assertNotNull($yogurt->getDairy());
@@ -71,17 +68,17 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSettings()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
         $settings = $yogurt->getSettings();
 
         # Test that our directory was set and that the default extension is set.
-        $this->assertSame($this->mock_directory, $settings["directory"]);
+        $this->assertSame($this->directory, $settings["directory"]);
         $this->assertSame("html", $settings["extension"]);
     }
 
     public function testSetDirectory()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
 
         $dir = "./..";
 
@@ -89,18 +86,16 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
         $settings = $yogurt->getSettings();
 
-        # Newly set directory was successfully set.
         $this->assertSame($dir, $settings["directory"]);
     }
 
     public function testSetDirectoryError()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
         $settings = $yogurt->getSettings();
 
         $old_dir = $settings["directory"];
 
-        # Mock and invalid variables.
         $dir_1 = 1234;
         $dir_2 = "not_a_directory";
 
@@ -121,7 +116,7 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
     public function testSetExtension()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
 
         $ext = "new-extension";
 
@@ -129,13 +124,12 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
 
         $settings = $yogurt->getSettings();
 
-        # Newly set directory was successfully set.
         $this->assertSame($ext, $settings["extension"]);
     }
 
     public function testSetExtensionError()
     {
-        $yogurt = $this->mock_yogurt;
+        $yogurt = $this->yogurt;
         $settings = $yogurt->getSettings();
 
         $old_ext = $settings["extension"];
