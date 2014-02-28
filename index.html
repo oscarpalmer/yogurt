@@ -4,28 +4,40 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Yogurt by oscarpalmer</title>
-
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
   </head>
   <body>
-    <div class="wrapper">
+
       <header>
         <h1>Yogurt</h1>
-        <p>A tiny templating engine.</p>
-        <p class="view"><a href="https://github.com/oscarpalmer/yogurt">View the Project on GitHub <small>oscarpalmer/yogurt</small></a></p>
-        <ul>
-          <li><a href="https://github.com/oscarpalmer/yogurt/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/oscarpalmer/yogurt/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/oscarpalmer/yogurt">View On <strong>GitHub</strong></a></li>
-        </ul>
+        <p>Yogurt is a template language for PHP.</p>
       </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/oscarpalmer/yogurt" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/oscarpalmer/yogurt/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/oscarpalmer/yogurt/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
       <section>
         <h1>
 <a name="yogurt" class="anchor" href="#yogurt"><span class="octicon octicon-link"></span></a>Yogurt</h1>
@@ -41,7 +53,7 @@
 
 <div class="highlight highlight-json"><pre><span class="p">{</span>
   <span class="nt">"require"</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">"oscarpalmer/yogurt"</span><span class="p">:</span> <span class="s2">"dev-master"</span>
+    <span class="nt">"oscarpalmer/yogurt"</span><span class="p">:</span> <span class="s2">"1.*"</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -49,7 +61,9 @@
 <h2>
 <a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
 
-<div class="highlight highlight-php"><pre><span class="nv">$yogurt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Yogurt</span><span class="p">(</span><span class="s2">"./directory/for/templates"</span><span class="p">,</span> <span class="s2">"template-extension"</span><span class="p">);</span>
+<div class="highlight highlight-php"><pre><span class="k">use</span> <span class="nx">oscarpalmer\Yogurt\Yogurt</span><span class="p">;</span>
+
+<span class="nv">$yogurt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Yogurt</span><span class="p">(</span><span class="s2">"./directory/for/templates"</span><span class="p">,</span> <span class="s2">"template-extension"</span><span class="p">);</span>
 
 <span class="nv">$flavour</span> <span class="o">=</span> <span class="nv">$yogurt</span><span class="o">-&gt;</span><span class="na">flavour</span><span class="p">(</span><span class="s2">"my-template"</span><span class="p">);</span>
 <span class="c1"># Or $flavour = new Flavour($yogurt, "my-template");</span>
@@ -57,6 +71,8 @@
 <span class="nv">$flavour</span><span class="o">-&gt;</span><span class="na">data</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
   <span class="s2">"title"</span> <span class="o">=&gt;</span> <span class="s2">"My Title"</span>
 <span class="p">));</span>
+
+<span class="nv">$flavour</span><span class="o">-&gt;</span><span class="na">tagline</span> <span class="o">=</span> <span class="s2">"My tagline."</span><span class="p">;</span>
 
 <span class="k">echo</span> <span class="nv">$flavour</span><span class="o">-&gt;</span><span class="na">taste</span><span class="p">();</span>
 <span class="c1"># Or just echo $flavour;</span>
@@ -124,19 +140,18 @@
 
 <ul>
 <li>Caching.</li>
-<li>Remove plain PHP.</li>
-<li>Including variables.</li>
+<li>Including variables; i.e. a filename stored as a variable.</li>
 <li>Other languages?</li>
 </ul><h2>
-<a name="licence" class="anchor" href="#licence"><span class="octicon octicon-link"></span></a>Licence</h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
 
-<p>Copyright (c) 2014 Oscar Palmér. MIT Licensed.</p>
+<p>MIT Licensed; see <a href="LICENSE">the LICENSE file</a> for more info.</p>
       </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/oscarpalmer">oscarpalmer</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/oscarpalmer">oscarpalmer</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
