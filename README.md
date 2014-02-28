@@ -11,7 +11,7 @@ Yogurt is available via Composer and works with PHP `>=5.3`.
 ```json
 {
   "require": {
-    "oscarpalmer/yogurt": "dev-master"
+    "oscarpalmer/yogurt": "1.*"
   }
 }
 ```
