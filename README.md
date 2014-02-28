@@ -19,6 +19,8 @@ Yogurt is available via Composer and works with PHP `>=5.3`.
 ## Getting started
 
 ```php
+use oscarpalmer\Yogurt\Yogurt;
+
 $yogurt = new Yogurt("./directory/for/templates", "template-extension");
 
 $flavour = $yogurt->flavour("my-template");
@@ -27,6 +29,8 @@ $flavour = $yogurt->flavour("my-template");
 $flavour->data(array(
   "title" => "My Title"
 ));
+
+$flavour->tagline = "My tagline.";
 
 echo $flavour->taste();
 # Or just echo $flavour;

@@ -36,6 +36,17 @@ class Flavour
     }
 
     /**
+     * Set a new or change an existing data item magically.
+     *
+     * @param mixed $key   Key for item.
+     * @param mixed $value Value for item.
+     */
+    public function __set($key, $value)
+    {
+        $this->data[$key] = $value;
+    }
+
+    /**
      * Return rendered template on direct access of Flavour object.
      */
     public function __toString()
@@ -180,7 +191,7 @@ class Flavour
         }
 
         $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\"><p>";
-        $suffix = " on line <code>$line</code> in your template.</p></div>";
+        $suffix = " on line <code>{$line}</code> in your template.</p></div>";
 
         echo("{$prefix}{$string}{$suffix}");
 

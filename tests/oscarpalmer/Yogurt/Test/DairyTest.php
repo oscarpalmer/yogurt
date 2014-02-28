@@ -8,100 +8,119 @@ use oscarpalmer\Yogurt\Yogurt;
 class DairyTest extends \PHPUnit_Framework_TestCase
 {
     # Mock variables.
-    protected $mock_directory;
-    protected $mock_dairy;
+    protected $directory;
+    protected $dairy;
 
     public function setUp()
     {
-        $this->mock_dairy = new Dairy(array(
+        $this->directory = __DIR__ . "/../../../assets";
+
+        $this->dairy = new Dairy(array(
             # These are usually passed on by Yogurt.
-            "directory" => __DIR__ . "/../../../assets",
+            "directory" => $this->directory,
             "extension" => "html"
         ));
-
-        # Valid directory.
-        $this->mock_directory = __DIR__ . "/../../../assets";
     }
 
     public function testConstructor()
     {
-        $dairy = $this->mock_dairy;
+        $dairy = $this->dairy;
 
         # Proper Dairy object.
         $this->assertNotNull($dairy);
         $this->assertInstanceOf("oscarpalmer\Yogurt\Dairy", $dairy);
     }
 
+    public function testErrors()
+    {
+        $dairy = $this->dairy;
+        $template = file_get_contents($this->directory . "/errors.html");
+
+        foreach (array("parseForeachs", "parseIfs", "parseIncludes") as $method) {
+            try {
+                $dairy->$method($template);
+            } catch (\Exception $e) {
+                $this->assertNotNull($e);
+                $this->assertInstanceOf("LogicException", $e);
+            }
+        }
+
+        try {
+            $dairy->parseIncludes(file_get_contents($this->directory . "/includes_error.html"));
+        } catch (\Exception $e) {
+            $this->assertNotNull($e);
+            $this->assertInstanceOf("LogicException", $e);
+            $this->assertSame($this->directory . "/not_a_file.html does not exist.", $e->getMessage());
+        }
+    }
+
     public function testParseForeachs()
     {
-        $dairy = $this->mock_dairy;
+        $dairy = $this->dairy;
 
-        # Read and parse the file.
-        $template = file_get_contents($this->mock_directory . "/foreachs.html");
+        $template = file_get_contents($this->directory . "/foreachs.html");
         $template = $dairy->parseForeachs($template);
 
         echo $template;
 
-        # We know what to expect.
         $this->expectOutPutString("<?php foreach(\$items as \$item): ?>\n<!-- item -->\n<?php endforeach; ?>");
     }
 
     public function testParseIfs()
     {
-        $dairy = $this->mock_dairy;
+        $dairy = $this->dairy;
 
         # Read and parse the file.
-        $template = file_get_contents($this->mock_directory . "/ifs.html");
+        $template = file_get_contents($this->directory . "/ifs.html");
         $template = $dairy->parseIfs($template);
 
         echo $template;
 
-        # We know what to expect.
         $this->expectOutPutString("<?php if(isset(\$title)): ?><!-- body --><?php endif; ?>\n<?php if(\$title == \"A\"): ?>A<?php elseif(\$title === \"B\"): ?>B<?php else: ?>C<?php endif; ?>");
     }
 
     public function testParseIncludes()
     {
-        $dairy = $this->mock_dairy;
+        $dairy = $this->dairy;
 
-        # Read and parse the file.
-        $template = file_get_contents($this->mock_directory . "/includes.html");
+        $template = file_get_contents($this->directory . "/includes.html");
         $template = $dairy->parseIncludes($template);
 
         echo $template;
 
-        # We know what to expect.
         $this->expectOutPutString("<?php if(\$title == \"A\"): ?>A<?php else: ?>!A<?php endif; ?>");
     }
 
     public function testParseVariables()
     {
-        $dairy = $this->mock_dairy;
+        $dairy = $this->dairy;
 
-        # Read and parse the file.
-        $template = file_get_contents($this->mock_directory . "/simple.html");
+        $template = file_get_contents($this->directory . "/simple.html");
         $template = $dairy->parseVariables($template);
 
         echo $template;
 
-        # We know what to expect.
         $this->expectOutPutString("<?php echo(\$title); ?>");
     }
 
-    /** Testing static functions. */
+    /** Static functions. */
 
+    /**
+     * @covers oscarpalmer\Yogurt\Dairy::parse
+     * @covers oscarpalmer\Yogurt\Dairy::displaySyntaxErrorMessage
+     */
     public function testDisplaySyntaxErrorMessage()
     {
-        $filename = $this->mock_directory . "/simple.html";
-        $message = "<!-- This is not a real syntax error. -->";
+        $dairy = $this->dairy;
 
-        Dairy::displaySyntaxErrorMessage(new \Exception($message), $filename);
+        $template = $this->directory . "/errors.html";
+        $error = "<!-- for error -->This is a foreach error.<!-- endfor -->";
 
-        # We know what to expect.
         $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\"><p><b>Error!</b></p>";
-        $middle = "<p>The syntax below is invalid and can be found in the template file <code>{$filename}</code>.</p>";
-        $suffix = "<pre>" . htmlspecialchars($message) . "</pre>\n</div>";
+        $middle = "<p>The syntax below is invalid and can be found in the template file <code>{$template}</code>.</p>";
+        $suffix = "<pre>" . htmlspecialchars($error) . "</pre>\n</div>";
 
+        $dairy->parse($template);
         $this->expectOutputString("{$prefix}\n{$middle}\n{$suffix}");
     }
 

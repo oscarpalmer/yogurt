@@ -82,17 +82,13 @@ class Yogurt
 
         $directory = rtrim($directory, "/");
 
-        try {
-            if (is_dir($directory)) {
-                $this->settings["directory"] = $directory;
+        if (is_dir($directory)) {
+            $this->settings["directory"] = $directory;
 
-                return $this;
-            }
-
-            throw new \LogicException("The directory $directory does not exist.");
-        } catch (\Exception $exception) {
-            throw $exception;
+            return $this;
         }
+
+        throw new \LogicException("The directory {$directory} does not exist.");
     }
 
     /**

@@ -183,7 +183,7 @@ class Dairy
             $filename = "{$this->settings['directory']}/{$file}.{$ext}";
 
             if (!is_file($filename)) {
-                throw new \Exception("{$filename} does not exist.");
+                throw new \LogicException("{$filename} does not exist.");
             }
 
             $template = str_replace($match, $this->parse($filename, false), $template);
@@ -262,9 +262,9 @@ class Dairy
 
         if ($operator == "is") {
             return " == ";
-        } else {
-            return " != ";
         }
+
+        return " != ";
     }
 
     /**
@@ -279,8 +279,8 @@ class Dairy
             return trim($value, "'\"");
         } elseif (preg_match("/\A\"|'/", $value)) {
             return $value;
-        } else {
-            return static::getObjectKey($value);
         }
+
+        return static::getObjectKey($value);
     }
 }

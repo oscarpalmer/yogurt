@@ -8,23 +8,23 @@ use oscarpalmer\Yogurt\Yogurt;
 class FlavourTest extends \PHPUnit_Framework_TestCase
 {
     # Mock variables.
-    protected $mock_data;
-    protected $mock_flavour;
+    protected $data;
+    protected $flavour;
 
     public function setUp()
     {
-        $this->mock_data = array(
+        $this->data = array(
             # Settings; usually passed on by Yogurt.
             "body" => "<p>Tests for Yogurt.</p>",
             "title" => "Yogurt Tests"
         );
 
-        $this->mock_flavour = new Flavour(new Yogurt(__DIR__ . "/../../../assets"), "simple");
+        $this->flavour = new Flavour(new Yogurt(__DIR__ . "/../../../assets"), "simple");
     }
 
     public function testConstructor()
     {
-        $flavour = $this->mock_flavour;
+        $flavour = $this->flavour;
 
         # Proper Flavour object.
         $this->assertNotNull($flavour);
@@ -33,53 +33,54 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
 
     public function testToString()
     {
-        $flavour = $this->mock_flavour;
-        $flavour->data($this->mock_data);
+        $flavour = $this->flavour;
+        $flavour->data($this->data);
 
-        echo $flavour;
-
-        # We know what to expect.
-        $this->expectOutputString("Yogurt Tests");
+        $this->assertSame("Yogurt Tests", (string) $flavour);
     }
 
+    /**
+     * @covers oscarpalmer\Yogurt\Flavour::__set
+     * @covers oscarpalmer\Yogurt\Flavour::data
+     */
     public function testData()
     {
-        $flavour = $this->mock_flavour;
+        $flavour = $this->flavour;
 
         $data = $flavour->data();
 
-        # Data is empty array by default.
         $this->assertNotNull($data);
         $this->assertEmpty($data);
 
-        $flavour->data($this->mock_data);
+        $flavour->data($this->data);
+        $flavour->magic = "cool";
         $data = $flavour->data();
 
-        # Our data was successfully set.
-        $this->assertCount(2, $data);
-        $this->assertSame($this->mock_data["body"], $data["body"]);
-        $this->assertSame($this->mock_data["title"], $data["title"]);
+        $this->assertCount(3, $data);
+        $this->assertSame($this->data["body"], $data["body"]);
+        $this->assertSame($this->data["title"], $data["title"]);
+        $this->assertSame("cool", $data["magic"]);
     }
 
     public function testGetDataObject()
     {
-        $flavour = $this->mock_flavour;
+        $flavour = $this->flavour;
 
-        $flavour->data($this->mock_data);
+        $flavour->data($this->data);
 
         $dataObject = $flavour->getDataObject();
     }
 
     public function testGetFilename()
     {
-        $flavour = $this->mock_flavour;
+        $flavour = $this->flavour;
 
         $this->assertFileExists($flavour->getFilename());
     }
 
     public function testSetFilename()
     {
-        $flavour = $this->mock_flavour;
+        $flavour = $this->flavour;
         $template = "foreachs";
 
         $flavour->setFilename($template);
@@ -89,9 +90,8 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
 
     public function testSetFilenameError()
     {
-        $flavour = $this->mock_flavour;
+        $flavour = $this->flavour;
 
-        # Mock and invalid variables.
         $filename_1 = 1234;
         $filename_2 = "not_a_filename";
 
@@ -99,7 +99,6 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
             try {
                 $flavour->setFilename($filename);
             } catch (\Exception $e) {
-                # Valid exception object.
                 $this->assertNotNull($e);
                 $this->assertInstanceOf("Exception", $e);
             }
@@ -108,19 +107,17 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
 
     public function testTaste()
     {
-        $flavour = $this->mock_flavour;
+        $flavour = $this->flavour;
 
-        echo $flavour->taste($this->mock_data);
-
-        # We know what to expect.
-        $this->expectOutputString("Yogurt Tests");
+        $this->assertSame("Yogurt Tests", $flavour->taste($this->data));
     }
 
     /** Testing static functions. */
 
     public function testArrayToObject()
     {
-        $data = $this->mock_data;
+        $data = $this->data;
+        $data["arr"] = array(1, 2, 3);
 
         $object = Flavour::arrayToObject($data);
 
@@ -132,14 +129,15 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
     public function testErrorHandler()
     {
         # Needed because the error handler only handles Flavour's errors.
-        $flavour = $this->mock_flavour;
+        $flavour = $this->flavour;
         $flavour_class = new \ReflectionClass(get_class($flavour));
         $flavour_file = $flavour_class->getFilename();
 
         # Custom error.
-        $error = Flavour::errorHandler(0, "Error handler", $flavour_file, 1, array());
-
+        Flavour::errorHandler(0, "Error handler", $flavour_file, 1, array());
         # Error should be displayed like this:
         $this->expectOutputString("<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\"><p>Error handler on line <code>1</code> in your template.</p></div>");
+
+        $this->assertFalse(Flavour::errorHandler(0, "Error handler", __FILE__, 1, array()));
     }
 }
