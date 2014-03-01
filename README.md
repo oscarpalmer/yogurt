@@ -2,11 +2,13 @@
 
 [![Build Status](https://travis-ci.org/oscarpalmer/yogurt.png?branch=master)](https://travis-ci.org/oscarpalmer/yogurt) [![Coverage Status](https://coveralls.io/repos/oscarpalmer/yogurt/badge.png)](https://coveralls.io/r/oscarpalmer/yogurt)
 
-Yogurt is a template language for PHP inspired by [Riot's](http://riothq.com) [Hammer](http://hammerformac.com). Hammer's syntax was based on regular ol' HTML comment tags, so you won't have to install another syntax highlighter for your editor. Nice, huh?
+Yogurt is a template language for PHP (`>=5.3`) inspired by [Riot's](http://riothq.com) [Hammer](http://hammerformac.com). Hammer's syntax was based on regular ol' HTML comment tags, so you won't have to install another syntax highlighter for your editor. Nice, huh?
 
-## Installation
+## Getting started
 
-Yogurt is available via Composer and works with PHP `>=5.3`.
+### Installation
+
+Yogurt is available via Composer.
 
 ```json
 {
@@ -16,7 +18,7 @@ Yogurt is available via Composer and works with PHP `>=5.3`.
 }
 ```
 
-## Getting started
+### Basic usage
 
 ```php
 use oscarpalmer\Yogurt\Yogurt;
