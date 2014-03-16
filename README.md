@@ -1,6 +1,6 @@
 # Yogurt
 
-[![Build Status](https://travis-ci.org/oscarpalmer/yogurt.png?branch=master)](https://travis-ci.org/oscarpalmer/yogurt) [![Coverage Status](https://coveralls.io/repos/oscarpalmer/yogurt/badge.png)](https://coveralls.io/r/oscarpalmer/yogurt)
+[![PHP version](https://badge.fury.io/ph/oscarpalmer%2Fyogurt.png)](http://badge.fury.io/ph/oscarpalmer%2Fyogurt) [![Build Status](https://travis-ci.org/oscarpalmer/yogurt.png?branch=master)](https://travis-ci.org/oscarpalmer/yogurt) [![Coverage Status](https://coveralls.io/repos/oscarpalmer/yogurt/badge.png)](https://coveralls.io/r/oscarpalmer/yogurt)
 
 Yogurt is a template language for PHP (`>=5.3`) inspired by [Riot's](http://riothq.com) [Hammer](http://hammerformac.com). Hammer's syntax was based on regular ol' HTML comment tags, so you won't have to install another syntax highlighter for your editor. Nice, huh?
 
