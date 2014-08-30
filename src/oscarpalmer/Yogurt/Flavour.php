@@ -110,14 +110,14 @@ class Flavour
      */
     public function setFilename($name)
     {
-        if (!is_string($name)) {
+        if (is_string($name) === false) {
             throw new \InvalidArgumentException("Filename must be a string, " . gettype($name) . " given.");
         }
 
         $settings = $this->yogurt->getSettings();
         $filename = $settings["directory"] . "/$name";
 
-        if (!preg_match("/\.{$settings['extension']}\z/", $filename)) {
+        if (preg_match("/\.{$settings['extension']}\z/", $filename) === false) {
             $filename .= ".{$settings['extension']}";
         }
 

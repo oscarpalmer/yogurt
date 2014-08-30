@@ -182,7 +182,7 @@ class Dairy
 
             $filename = "{$this->settings['directory']}/{$file}.{$ext}";
 
-            if (!is_file($filename)) {
+            if (is_file($filename) === false) {
                 throw new \LogicException("{$filename} does not exist.");
             }
 

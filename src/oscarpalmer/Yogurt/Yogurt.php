@@ -8,6 +8,11 @@ namespace oscarpalmer\Yogurt;
 class Yogurt
 {
     /**
+     * @var string Current version number.
+     */
+    const VERSION = "1.1.0";
+
+    /**
      * @var Dairy Dairy, the parser.
      */
     protected $dairy;
@@ -76,7 +81,7 @@ class Yogurt
      */
     public function setDirectory($directory)
     {
-        if (!is_string($directory)) {
+        if (is_string($directory) === false) {
             throw new \InvalidArgumentException("Directory name must be a string, " . gettype($directory) . " given.");
         }
 
