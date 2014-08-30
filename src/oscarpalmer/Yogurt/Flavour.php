@@ -59,12 +59,18 @@ class Flavour
     /**
      * Add data to flavour.
      *
-     * @param  array $data Data to add.
-     * @return array All the data.
+     * @param  array|object $data Data to add.
+     * @return array        All the data.
      */
-    public function data(array $data = null)
+    public function data($data = null)
     {
         if (isset($data)) {
+            if ((is_array($data) || is_object($data)) === false) {
+                throw new \InvalidArgumentException("Data must be of the array or object type.");
+            }
+
+            $data = (array) $data;
+
             foreach ($data as $key => $value) {
                 $this->data[$key] = $value;
             }
@@ -76,7 +82,7 @@ class Flavour
     /**
      * Array to object and then object to associative array.
      *
-     * @return array Array of data.
+     * @return array|object Array or object of data.
      */
     public function getDataObject()
     {
@@ -127,10 +133,10 @@ class Flavour
     /**
      * Render the template.
      *
-     * @param  array  $data More data to add.
-     * @return string The rendered template.
+     * @param  array|object $data More data to add.
+     * @return string       The rendered template.
      */
-    public function taste(array $data = null)
+    public function taste($data = null)
     {
         $data = $this->data($data);
         $data = $this->getDataObject();

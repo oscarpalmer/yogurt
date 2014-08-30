@@ -100,7 +100,7 @@ class DairyTest extends \PHPUnit_Framework_TestCase
 
         echo $template;
 
-        $this->expectOutPutString("<?php echo(\$title); ?>");
+        $this->expectOutPutString("<?php echo(\$title); ?>; <?php echo(\$object->title); ?>");
     }
 
     /** Static functions. */

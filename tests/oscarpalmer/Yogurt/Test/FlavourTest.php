@@ -13,11 +13,17 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->data = array(
-            # Settings; usually passed on by Yogurt.
+        $data = array(
             "body" => "<p>Tests for Yogurt.</p>",
             "title" => "Yogurt Tests"
         );
+
+        $object = new \stdClass;
+        $object->title = "Yogurt Tests, object";
+
+        $data["object"] = $object;
+
+        $this->data = $data;
 
         $this->flavour = new Flavour(new Yogurt(__DIR__ . "/../../../assets"), "simple");
     }
@@ -36,7 +42,7 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
         $flavour = $this->flavour;
         $flavour->data($this->data);
 
-        $this->assertSame("Yogurt Tests", (string) $flavour);
+        $this->assertSame("Yogurt Tests; Yogurt Tests, object", (string) $flavour);
     }
 
     /**
@@ -56,10 +62,16 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
         $flavour->magic = "cool";
         $data = $flavour->data();
 
-        $this->assertCount(3, $data);
+        $this->assertCount(4, $data);
         $this->assertSame($this->data["body"], $data["body"]);
         $this->assertSame($this->data["title"], $data["title"]);
         $this->assertSame("cool", $data["magic"]);
+
+        try {
+            $flavour->data(1);
+        } catch (\Exception $e) {
+            $this->assertSame($e->getMessage(), "Data must be of the array or object type.");
+        }
     }
 
     public function testGetDataObject()
@@ -109,7 +121,7 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
     {
         $flavour = $this->flavour;
 
-        $this->assertSame("Yogurt Tests", $flavour->taste($this->data));
+        $this->assertSame("Yogurt Tests; Yogurt Tests, object", $flavour->taste($this->data));
     }
 
     /** Testing static functions. */
