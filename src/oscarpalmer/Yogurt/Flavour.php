@@ -117,7 +117,7 @@ class Flavour
         $settings = $this->yogurt->getSettings();
         $filename = $settings["directory"] . "/$name";
 
-        if (preg_match("/\.{$settings['extension']}\z/", $filename) === false) {
+        if (!preg_match("/\.{$settings['extension']}\z/", $filename)) {
             $filename .= ".{$settings['extension']}";
         }
 
