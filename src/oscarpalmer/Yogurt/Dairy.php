@@ -223,7 +223,9 @@ class Dairy
             static::VARIABLE_START_REGEX .
             static::VARIABLE_REGEX .
             static::VARIABLE_END_REGEX,
-        $template, $matches);
+            $template,
+            $matches
+        );
 
         foreach ($matches[0] as $index => $variable) {
             $var = static::getObjectKey($matches[1][$index]);
