@@ -96,6 +96,7 @@ Strings however, do need quotation marks; if they're not wrapped in quotation ma
 
 ## Todo
 
+- String modifiers, e.g. `htmlspecialchars`.
 - Caching.
 - Including variables; i.e. a filename stored as a variable.
 - Other languages?

@@ -10,9 +10,25 @@ class Dairy
     /**
      * @var string Useful regex snippets.
      */
+    const ELSE_REGEX = "/<!--\s*else\s*-->/";
+    const ELSEIF_REGEX = "/<!--\s*elseif.*?-->/";
+    const ELSEIF_END_REGEX = "\s*|)-->\z/";
+    const ELSEIF_START_REGEX = "/\A<!--\s*elseif\s*";
+    const FOREACH_REGEX = "/<!--\s*for.*?endfor\s*-->/s";
+    const FOREACH_END_REGEX = "\s*-->(.*?)<!--\s*endfor\s*-->\z/s";
+    const FOREACH_START_REGEX = "/\A<!--\s*for\s+([\w\-]+)\s+in\s+";
+    const IF_REGEX = "/<!--\s*if.*?endif\s*-->/s";
+    const IF_END_REGEX = "\s*|)-->(.*?)<!--\s*endif\s*-->\z/s";
+    const IF_START_REGEX = "/\A<!--\s*if\s*";
+    const INCLUDE_REGEX = "/<!--\s*include.*?\s*-->/";
+    const INCLUDE_COMPLEX_REGEX = "/\A<!--\s*include\s*([\w]+)(?:\.(\w+)|)\s*-->\z/";
+    const NO_PHP_REGEX = "/<\?php.*?\?>/";
     const OPERATOR_REGEX = "(?:(={2,3}|!={1,2}|>=|<=|<>|>|<|is|isnt)";
+    const SPACE_REGEX = "\s*";
     const VALUE_REGEX = "([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)";
     const VARIABLE_REGEX = "([\w\-\.\{\}]+)";
+    const VARIABLE_END_REGEX = "\s*-->/";
+    const VARIABLE_START_REGEX = "/<!--\s*";
 
     /**
      * @var string Filename of template.
@@ -51,7 +67,7 @@ class Dairy
 
         try {
             $template = file_get_contents($filename);
-            $template = preg_replace("/<\?php.*?\?>/", "", $template);
+            $template = preg_replace(static::NO_PHP_REGEX, "", $template);
 
             $template = $this->parseForeachs($template);
             $template = $this->parseIfs($template);
@@ -72,13 +88,13 @@ class Dairy
      */
     public function parseForeachs($template)
     {
-        preg_match_all("/<!--\s*for.*?endfor\s*-->/s", $template, $matches);
+        preg_match_all(static::FOREACH_REGEX, $template, $matches);
 
         foreach ($matches[0] as $match) {
             preg_match(
-                "/\A<!--\s*for\s+([\w\-]+)\s+in\s+" .
+                static::FOREACH_START_REGEX .
                 static::VARIABLE_REGEX .
-                "\s*-->(.*?)<!--\s*endfor\s*-->\z/s",
+                static::FOREACH_END_REGEX,
                 $match,
                 $foreach
             );
@@ -105,28 +121,28 @@ class Dairy
      */
     public function parseIfs($template)
     {
-        $template = preg_replace("/<!--\s*else\s*-->/", "<?php else: ?>", $template);
+        $template = preg_replace(static::ELSE_REGEX, "<?php else: ?>", $template);
 
         $regex = array(
             "if" => array(
-                "/<!--\s*if.*?endif\s*-->/s",
-                "/\A<!--\s*if\s*" .
+                static::IF_REGEX,
+                static::IF_START_REGEX .
                 static::VALUE_REGEX .
-                "\s*" .
+                static::SPACE_REGEX .
                 static::OPERATOR_REGEX .
-                "\s*" .
+                static::SPACE_REGEX .
                 static::VALUE_REGEX .
-                "\s*|)-->(.*?)<!--\s*endif\s*-->\z/s"
+                static::IF_END_REGEX
             ),
             "elseif" => array(
-                "/<!--\s*elseif.*?-->/",
-                "/\A<!--\s*elseif\s*" .
+                static::ELSEIF_REGEX,
+                static::ELSEIF_START_REGEX .
                 static::VALUE_REGEX .
-                "\s*" .
+                static::SPACE_REGEX .
                 static::OPERATOR_REGEX .
-                "\s*" .
+                static::SPACE_REGEX .
                 static::VALUE_REGEX .
-                "\s*|)-->\z/"
+                static::ELSEIF_END_REGEX
             )
         );
 
@@ -146,12 +162,15 @@ class Dairy
 
                 $key = static::getValue($if[1]);
                 $key = $exists ? "isset($key)" : $key;
-                $opr = $exists ? "" : static::getOperator($if[2]);
-                $val = $exists ? "" : static::getValue($if[3]);
-                $blk = $elseif ? "" : $if[4];
+
+                $operator = $exists ? "" : static::getOperator($if[2]);
+
+                $value = $exists ? "" : static::getValue($if[3]);
+                $block = $elseif ? "" : $if[4];
+
                 $end = $elseif ? "" : "<?php endif; ?>";
 
-                $replacement = "<?php $name($key$opr$val): ?>$blk$end";
+                $replacement = "<?php {$name}({$key}{$operator}{$value}): ?>{$block}{$end}";
 
                 $template = str_replace($match, $replacement, $template);
             }
@@ -168,10 +187,10 @@ class Dairy
      */
     public function parseIncludes($template)
     {
-        preg_match_all("/<!--\s*include.*?\s*-->/", $template, $matches);
+        preg_match_all(static::INCLUDE_REGEX, $template, $matches);
 
         foreach ($matches[0] as $match) {
-            preg_match("/\A<!--\s*include\s*([\w]+)(?:\.(\w+)|)\s*-->\z/", $match, $include);
+            preg_match(static::INCLUDE_COMPLEX_REGEX, $match, $include);
 
             if (empty($include)) {
                 throw new \LogicException($match);
@@ -200,7 +219,11 @@ class Dairy
      */
     public function parseVariables($template)
     {
-        preg_match_all("/<!--\s*" . static::VARIABLE_REGEX . "\s*-->/", $template, $matches);
+        preg_match_all(
+            static::VARIABLE_START_REGEX .
+            static::VARIABLE_REGEX .
+            static::VARIABLE_END_REGEX,
+        $template, $matches);
 
         foreach ($matches[0] as $index => $variable) {
             $var = static::getObjectKey($matches[1][$index]);
@@ -223,6 +246,7 @@ class Dairy
     {
         $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\">";
         $prefix .= "<p><b>Error!</b></p>";
+
         $middle = "<p>The syntax below is invalid and can be found in the template file";
         $middle .= " <code>{$filename}</code>.</p>";
 

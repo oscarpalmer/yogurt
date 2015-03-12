@@ -27,7 +27,6 @@ class DairyTest extends \PHPUnit_Framework_TestCase
         $dairy = $this->dairy;
 
         # Proper Dairy object.
-        $this->assertNotNull($dairy);
         $this->assertInstanceOf("oscarpalmer\Yogurt\Dairy", $dairy);
     }
 
@@ -40,7 +39,6 @@ class DairyTest extends \PHPUnit_Framework_TestCase
             try {
                 $dairy->$method($template);
             } catch (\Exception $e) {
-                $this->assertNotNull($e);
                 $this->assertInstanceOf("LogicException", $e);
             }
         }
@@ -48,9 +46,7 @@ class DairyTest extends \PHPUnit_Framework_TestCase
         try {
             $dairy->parseIncludes(file_get_contents($this->directory . "/includes_error.html"));
         } catch (\Exception $e) {
-            $this->assertNotNull($e);
             $this->assertInstanceOf("LogicException", $e);
-            $this->assertSame($this->directory . "/not_a_file.html does not exist.", $e->getMessage());
         }
     }
 
@@ -134,7 +130,7 @@ class DairyTest extends \PHPUnit_Framework_TestCase
     {
         # Regular comparison operators.
         foreach (array("===", "==", "!==", "!=", ">=", "<=", "<>", ">", "<") as $operator) {
-            $this->assertSame(" $operator ", Dairy::getOperator($operator));
+            $this->assertSame(" {$operator} ", Dairy::getOperator($operator));
         }
 
         # Custom operators.

@@ -24,7 +24,6 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
         $yogurt = $this->yogurt;
 
         # Proper Yogurt object.
-        $this->assertNotNull($yogurt);
         $this->assertInstanceOf("oscarpalmer\Yogurt\Yogurt", $yogurt);
     }
 
@@ -35,7 +34,6 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
         $flavour = $yogurt->flavour("simple");
 
         # Proper Flavour object.
-        $this->assertNotNull($flavour);
         $this->assertInstanceOf("oscarpalmer\Yogurt\Flavour", $flavour);
     }
 
@@ -51,7 +49,6 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
                 $flavour_test = $yogurt->flavour($flavour);
             } catch (\Exception $e) {
                 # Proper Exception object.
-                $this->assertNotNull($e);
                 $this->assertInstanceOf("Exception", $e);
             }
         }
@@ -62,7 +59,6 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
         $yogurt = $this->yogurt;
 
         # Proper Dairy object.
-        $this->assertNotNull($yogurt->getDairy());
         $this->assertInstanceOf("oscarpalmer\Yogurt\Dairy", $yogurt->getDairy());
     }
 
@@ -104,7 +100,6 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
                 $yogurt->setDirectory($dir);
             } catch (\Exception $e) {
                 # Proper Exception object.
-                $this->assertNotNull($e);
                 $this->assertInstanceOf("Exception", $e);
             }
         }
@@ -138,8 +133,7 @@ class YogurtTest extends \PHPUnit_Framework_TestCase
             $yogurt->setExtension(1234); # Invalid extension name.
         } catch (\Exception $e) {
             # Proper Exception object.
-            $this->assertNotNull($e);
-            $this->assertInstanceOf("Exception", $e);
+            $this->assertInstanceOf("InvalidArgumentException", $e);
         }
 
         $settings = $yogurt->getSettings();

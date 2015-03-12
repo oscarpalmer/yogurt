@@ -10,7 +10,7 @@ class Flavour
     /**
      * @var array Data to render.
      */
-    protected $data = array();
+    protected $data;
 
     /**
      * @var string Filename for template.
@@ -64,33 +64,17 @@ class Flavour
      */
     public function data($data = null)
     {
-        if (isset($data)) {
-            if ((is_array($data) || is_object($data)) === false) {
-                throw new \InvalidArgumentException("Data must be of the array or object type.");
+        if (is_null($data) === false) {
+            if (is_array($data) === false && is_object($data) === false) {
+                throw new \InvalidArgumentException("Data must be either an array or an object.");
             }
 
-            $data = (array) $data;
-
-            foreach ($data as $key => $value) {
-                $this->data[$key] = $value;
+            foreach ((object) $data as $key => $value) {
+                $this->{$key} = $value;
             }
         }
 
         return $this->data;
-    }
-
-    /**
-     * Array to object and then object to associative array.
-     *
-     * @return array|object Array or object of data.
-     */
-    public function getDataObject()
-    {
-        $data = $this->data;
-        $data = static::arrayToObject($data);
-        $data = get_object_vars($data);
-
-        return $data;
     }
 
     /**
@@ -110,24 +94,24 @@ class Flavour
      */
     public function setFilename($name)
     {
-        if (is_string($name) === false) {
-            throw new \InvalidArgumentException("Filename must be a string, " . gettype($name) . " given.");
+        if (is_string($name)) {
+            $settings = $this->yogurt->getSettings();
+            $filename = $settings["directory"] . "/$name";
+
+            if (!preg_match("/\.{$settings['extension']}\z/", $filename)) {
+                $filename .= ".{$settings['extension']}";
+            }
+
+            if (is_file($filename)) {
+                $this->filename = $filename;
+
+                return $this;
+            }
+
+            throw new \LogicException("The template {$filename} does not exist.");
         }
 
-        $settings = $this->yogurt->getSettings();
-        $filename = $settings["directory"] . "/$name";
-
-        if (!preg_match("/\.{$settings['extension']}\z/", $filename)) {
-            $filename .= ".{$settings['extension']}";
-        }
-
-        if (is_file($filename)) {
-            $this->filename = $filename;
-
-            return $this;
-        }
-
-        throw new \LogicException("The template {$filename} does not exist.");
+        throw new \InvalidArgumentException("Filename must be a string, " . gettype($name) . " given.");
     }
 
     /**
@@ -155,30 +139,23 @@ class Flavour
         return ob_get_clean();
     }
 
-    /** Static functions. */
+    /** Protected functions. */
 
     /**
-     * Convert array to object.
+     * Array to object and then object to associative array.
      *
-     * @param  array  $array Array to convert.
-     * @return object Converted array.
+     * @return array|object Array or object of data.
      */
-    public static function arrayToObject(array $array)
+    public function getDataObject()
     {
-        $object = new \stdClass;
+        $data = $this->data;
+        $data = static::itemToObject($data);
+        $data = get_object_vars($data);
 
-        foreach ($array as $key => $value) {
-            if (strlen($key)) {
-                if (is_array($value)) {
-                    $object->{$key} = static::arrayToObject($value);
-                } else {
-                    $object->{$key} = $value;
-                }
-            }
-        }
-
-        return $object;
+        return $data;
     }
+
+    /** Static functions. */
 
     /**
      * Handle errors for the eval-function. Passes on the error if it's not a local error.
@@ -202,5 +179,18 @@ class Flavour
         echo("{$prefix}{$string}{$suffix}");
 
         return true;
+    }
+
+    /**
+     * Convert an item (array or object) to object.
+     *
+     * @param  array  $item item to convert.
+     * @return object Converted item.
+     */
+    public static function itemToObject($item)
+    {
+        $item = json_encode($item);
+
+        return json_decode($item, false);
     }
 }

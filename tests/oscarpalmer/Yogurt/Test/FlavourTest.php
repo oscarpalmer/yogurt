@@ -55,8 +55,7 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
 
         $data = $flavour->data();
 
-        $this->assertNotNull($data);
-        $this->assertEmpty($data);
+        $this->assertNull($data);
 
         $flavour->data($this->data);
         $flavour->magic = "cool";
@@ -70,7 +69,7 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
         try {
             $flavour->data(1);
         } catch (\Exception $e) {
-            $this->assertSame($e->getMessage(), "Data must be of the array or object type.");
+            $this->assertInstanceOf("InvalidArgumentException", $e);
         }
     }
 
@@ -111,7 +110,6 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
             try {
                 $flavour->setFilename($filename);
             } catch (\Exception $e) {
-                $this->assertNotNull($e);
                 $this->assertInstanceOf("Exception", $e);
             }
         }
@@ -126,12 +124,12 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
 
     /** Testing static functions. */
 
-    public function testArrayToObject()
+    public function testItemToObject()
     {
         $data = $this->data;
         $data["arr"] = array(1, 2, 3);
 
-        $object = Flavour::arrayToObject($data);
+        $object = Flavour::itemToObject($data);
 
         # Valid object.
         $this->assertNotNull($object);

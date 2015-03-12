@@ -81,19 +81,19 @@ class Yogurt
      */
     public function setDirectory($directory)
     {
-        if (is_string($directory) === false) {
-            throw new \InvalidArgumentException("Directory name must be a string, " . gettype($directory) . " given.");
+        if (is_string($directory)) {
+            $directory = rtrim($directory, "/");
+
+            if (is_dir($directory)) {
+                $this->settings["directory"] = $directory;
+
+                return $this;
+            }
+
+            throw new \LogicException("The directory {$directory} does not exist.");
         }
 
-        $directory = rtrim($directory, "/");
-
-        if (is_dir($directory)) {
-            $this->settings["directory"] = $directory;
-
-            return $this;
-        }
-
-        throw new \LogicException("The directory {$directory} does not exist.");
+        throw new \InvalidArgumentException("Directory name must be a string, " . gettype($directory) . " given.");
     }
 
     /**
