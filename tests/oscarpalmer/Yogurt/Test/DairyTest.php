@@ -108,7 +108,7 @@ class DairyTest extends \PHPUnit_Framework_TestCase
 
         echo($template);
 
-        $this->expectOutputString("<?php echo(htmlspecialchars((string) \$title, ENT_QUOTES | ENT_SUBSTITUTE, \"utf-8\")); ?>; <?php echo(htmlspecialchars((string) \$object->title, ENT_QUOTES | ENT_SUBSTITUTE, \"utf-8\")); ?>");
+        $this->expectOutputString("<?php echo(htmlspecialchars((string) \$title, \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")); ?>; <?php echo(htmlspecialchars((string) \$object->title, \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")); ?>");
     }
 
     /** Static functions. */

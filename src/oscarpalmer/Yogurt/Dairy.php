@@ -33,7 +33,7 @@ class Dairy
     const VARIABLE_REGEX = "([\w\-\.\{\}]+)";
     const VARIABLE_END_REGEX = "\s*-->/";
     const VARIABLE_START_REGEX = "/<!--\s*";
-    const VARIABLE_SUFFIX = ", ENT_QUOTES | ENT_SUBSTITUTE, \"utf-8\")); ?>";
+    const VARIABLE_SUFFIX = ", \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")); ?>";
 
     /**
      * @var string Filename of template.
@@ -336,10 +336,10 @@ class Dairy
      */
     public static function getFunctionName($modifier)
     {
-        switch ($modifier):
+        switch ($modifier) {
             case "raw":
-            return null;
-        endswitch;
+                return null;
+        }
     }
 
     /**
