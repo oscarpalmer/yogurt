@@ -8,7 +8,7 @@ namespace oscarpalmer\Yogurt;
 class Dairy
 {
     /**
-     * @var string Useful regex snippets.
+     * @var string Useful regexes and strings.
      */
     const ELSE_REGEX = "/<!--\s*else\s*-->/";
     const ELSEIF_REGEX = "/<!--\s*elseif.*?-->/";
@@ -22,13 +22,18 @@ class Dairy
     const IF_START_REGEX = "/\A<!--\s*if\s*";
     const INCLUDE_REGEX = "/<!--\s*include.*?\s*-->/";
     const INCLUDE_COMPLEX_REGEX = "/\A<!--\s*include\s*([\w]+)(?:\.(\w+)|)\s*-->\z/";
+    const MODIFIER_GREEDY_REGEX = "(\w+)";
+    const MODIFIER_NAMES_REGEX = "(raw)";
+    const MODIFIER_SEPARATOR_REGEX = "(\~|\|)";
     const NO_PHP_REGEX = "/<\?php.*?\?>/";
     const OPERATOR_REGEX = "(?:(={2,3}|!={1,2}|>=|<=|<>|>|<|is|isnt)";
     const SPACE_REGEX = "\s*";
     const VALUE_REGEX = "([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)";
+    const VARIABLE_PREFIX = "<?php echo(htmlspecialchars((string) ";
     const VARIABLE_REGEX = "([\w\-\.\{\}]+)";
     const VARIABLE_END_REGEX = "\s*-->/";
     const VARIABLE_START_REGEX = "/<!--\s*";
+    const VARIABLE_SUFFIX = ", ENT_QUOTES | ENT_SUBSTITUTE, \"utf-8\")); ?>";
 
     /**
      * @var string Filename of template.
@@ -72,7 +77,10 @@ class Dairy
             $template = $this->parseForeachs($template);
             $template = $this->parseIfs($template);
             $template = $this->parseIncludes($template);
+            $template = $this->parseModifiers($template);
             $template = $this->parseVariables($template);
+
+            #var_dump($template);exit;
 
             return $template;
         } catch (\Exception $exception) {
@@ -212,6 +220,60 @@ class Dairy
     }
 
     /**
+     * Parse variables with modifiers.
+     *
+     * @param  string $template Template to parse.
+     * @return Parsed Template.
+     */
+    public function parseModifiers($template)
+    {
+        preg_match_all(
+            static::VARIABLE_START_REGEX .
+            static::VARIABLE_REGEX .
+            static::SPACE_REGEX .
+            static::MODIFIER_SEPARATOR_REGEX .
+            static::SPACE_REGEX .
+            static::MODIFIER_GREEDY_REGEX .
+            static::VARIABLE_END_REGEX,
+            $template,
+            $matches
+        );
+
+        foreach ($matches[0] as $match) {
+            preg_match(
+                static::VARIABLE_START_REGEX .
+                static::VARIABLE_REGEX .
+                static::SPACE_REGEX .
+                static::MODIFIER_SEPARATOR_REGEX .
+                static::SPACE_REGEX .
+                static::MODIFIER_NAMES_REGEX .
+                static::VARIABLE_END_REGEX,
+                $match,
+                $modifier
+            );
+
+            if (empty($modifier)) {
+                throw new \LogicException($match);
+            }
+
+            $function = static::getFunctionName($modifier[2]);
+            $is_raw = is_null($function);
+            $variable = static::getObjectKey($modifier[1]);
+
+            $prefix = $is_raw ? "" : "{$function}(";
+            $suffix = $is_raw ? "": ")";
+
+            $template = str_replace(
+                $match,
+                "<?php echo({$prefix}(string) {$variable}{$suffix}); ?>",
+                $template
+            );
+        }
+
+        return $template;
+    }
+
+    /**
      * Parse variables.
      *
      * @param  string $template Template to parse.
@@ -230,7 +292,13 @@ class Dairy
         foreach ($matches[0] as $index => $variable) {
             $var = static::getObjectKey($matches[1][$index]);
 
-            $template = str_replace($variable, "<?php echo({$var}); ?>", $template);
+            $template = str_replace(
+                $variable,
+                static::VARIABLE_PREFIX .
+                $var .
+                static::VARIABLE_SUFFIX,
+                $template
+            );
         }
 
         return $template;
@@ -258,6 +326,20 @@ class Dairy
         $suffix = "<pre>{$suffix}</pre>\n</div>";
 
         echo("{$prefix}\n{$middle}\n{$suffix}");
+    }
+
+    /**
+     * Get function name for string modifier.
+     *
+     * @param  string Modifier function name to find.
+     * @return string Internal PHP function name.
+     */
+    public static function getFunctionName($modifier)
+    {
+        switch ($modifier):
+            case "raw":
+            return null;
+        endswitch;
     }
 
     /**
