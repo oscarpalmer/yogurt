@@ -3,6 +3,13 @@
 namespace oscarpalmer\Yogurt;
 
 /**
+ * Define ENT_SUBSTITUTE for older versions of PHP.
+ */
+if (defined("ENT_SUBSTITUTE") === false) {
+    define("ENT_SUBSTITUTE", 0);
+}
+
+/**
  * Dairy, the parser.
  */
 class Dairy
