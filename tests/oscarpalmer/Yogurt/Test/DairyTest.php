@@ -20,6 +20,9 @@ class DairyTest extends \PHPUnit_Framework_TestCase
             "directory" => $this->directory,
             "extension" => "html"
         ));
+
+        $this->htmlsc_start = "<?php echo(htmlspecialchars((string) ";
+        $this->htmlsc_end = ", \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")";
     }
 
     public function testConstructor()
@@ -28,6 +31,20 @@ class DairyTest extends \PHPUnit_Framework_TestCase
 
         # Proper Dairy object.
         $this->assertInstanceOf("oscarpalmer\Yogurt\Dairy", $dairy);
+    }
+
+    public function testModifiers()
+    {
+        $functions = array(
+            "escape" => array("htmlspecialchars(", $this->htmlsc_end),
+            "lowercase" => array("mb_strtolower(", ", \"utf-8\")"),
+            "trim" => array("trim(", ")"),
+            "uppercase" => array("mb_strtoupper(", ", \"utf-8\")")
+        );
+
+        foreach ($functions as $name => $function) {
+            $this->assertSame($function, $this->dairy->getModifierFunction($name));
+        }
     }
 
     public function testErrors()
@@ -50,18 +67,6 @@ class DairyTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testModifiers()
-    {
-        $dairy = $this->dairy;
-
-        $template = file_get_contents("{$this->directory}/modifiers.html");
-        $template = $dairy->parseModifiers($template);
-
-        echo($template);
-
-        $this->expectOutputString("<?php echo((string) \$variable); ?>");
-    }
-
     public function testParseForeachs()
     {
         $dairy = $this->dairy;
@@ -71,7 +76,11 @@ class DairyTest extends \PHPUnit_Framework_TestCase
 
         echo($template);
 
-        $this->expectOutputString("<?php foreach(\$items as \$item): ?>\n<!-- item -->\n<?php endforeach; ?>");
+        $this->expectOutputString(
+            "<?php foreach(\$items as \$items_index => \$item): ?>\n" .
+            "<!-- item -->\n" .
+            "<?php endforeach; ?>"
+        );
     }
 
     public function testParseIfs()
@@ -84,7 +93,12 @@ class DairyTest extends \PHPUnit_Framework_TestCase
 
         echo($template);
 
-        $this->expectOutputString("<?php if(isset(\$title)): ?><!-- body --><?php endif; ?>\n<?php if(\$title == \"A\"): ?>A<?php elseif(\$title === \"B\"): ?>B<?php else: ?>C<?php endif; ?>");
+        $this->expectOutputString(
+            "<?php if(isset(\$title)): ?><!-- body --><?php endif; ?>\n" .
+            "<?php if(\$title == \"A\"): ?>A" .
+            "<?php elseif(\$title === \"B\"): ?>B" .
+            "<?php else: ?>C<?php endif; ?>"
+        );
     }
 
     public function testParseIncludes()
@@ -96,7 +110,26 @@ class DairyTest extends \PHPUnit_Framework_TestCase
 
         echo($template);
 
-        $this->expectOutputString("<?php if(\$title == \"A\"): ?>A<?php else: ?>!A<?php endif; ?>");
+        $this->expectOutputString(
+            "<?php if(\$title == \"A\"): ?>A" .
+            "<?php else: ?>!A<?php endif; ?>"
+        );
+    }
+
+    public function testParseModifiers()
+    {
+        $dairy = $this->dairy;
+
+        $template = file_get_contents("{$this->directory}/modifiers.html");
+        $template = $dairy->parseModifiers($template);
+
+        echo($template);
+
+        $this->expectOutputString(
+            "{$this->htmlsc_start}\$variable{$this->htmlsc_end}); ?>\n" .
+            "<?php echo((string) \$variable); ?>\n" .
+            "<?php echo(trim((string) \$variable)); ?>"
+        );
     }
 
     public function testParseVariables()
@@ -108,7 +141,11 @@ class DairyTest extends \PHPUnit_Framework_TestCase
 
         echo($template);
 
-        $this->expectOutputString("<?php echo(htmlspecialchars((string) \$title, \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")); ?>; <?php echo(htmlspecialchars((string) \$object->title, \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")); ?>");
+        $this->expectOutputString(
+            "{$this->htmlsc_start}\$title{$this->htmlsc_end}); ?>;" .
+            " " .
+            "{$this->htmlsc_start}\$object->title{$this->htmlsc_end}); ?>"
+        );
     }
 
     /** Static functions. */
@@ -124,23 +161,12 @@ class DairyTest extends \PHPUnit_Framework_TestCase
         $template = "{$this->directory}/errors.html";
         $error = "<!-- for error -->This is a foreach error.<!-- endfor -->";
 
-        $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\"><p><b>Error!</b></p>";
+        $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1em;font-weight:normal\"><p><b>Syntax error!</b></p>";
         $middle = "<p>The syntax below is invalid and can be found in the template file <code>{$template}</code>.</p>";
         $suffix = "<pre>" . htmlspecialchars($error) . "</pre>\n</div>";
 
         $dairy->parse($template);
         $this->expectOutputString("{$prefix}\n{$middle}\n{$suffix}");
-    }
-
-    public function testGetFunctionName()
-    {
-        $functions = array(
-            "raw" => null
-        );
-
-        foreach ($functions as $name => $function) {
-            $this->assertSame($function, Dairy::getFunctionName($name));
-        }
     }
 
     public function testGetObjectKey()

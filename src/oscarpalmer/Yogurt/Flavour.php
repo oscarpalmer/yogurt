@@ -108,10 +108,14 @@ class Flavour
                 return $this;
             }
 
-            throw new \LogicException("The template {$filename} does not exist.");
+            throw new \LogicException("The template \"{$filename}\" does not exist.");
         }
 
-        throw new \InvalidArgumentException("Filename must be a string, " . gettype($name) . " given.");
+        throw new \InvalidArgumentException(
+            "Filename must be a string, \"" .
+            gettype($name) .
+            "\" given."
+        );
     }
 
     /**
@@ -173,7 +177,8 @@ class Flavour
             return false;
         }
 
-        $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\"><p>";
+        $prefix = "<div style=\"padding:0 1em;border:.5em solid red;";
+        $prefix .= "font-size:1em;font-weight:normal\"><p>";
         $suffix = " on line <code>{$line}</code> in your template.</p></div>";
 
         echo("{$prefix}{$string}{$suffix}");
@@ -189,8 +194,6 @@ class Flavour
      */
     public static function itemToObject($item)
     {
-        $item = json_encode($item);
-
-        return json_decode($item, false);
+        return json_decode(json_encode($item), false);
     }
 }

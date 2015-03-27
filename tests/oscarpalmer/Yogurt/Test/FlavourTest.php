@@ -146,7 +146,7 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
         # Custom error.
         Flavour::errorHandler(0, "Error handler", $flavour_file, 1, array());
         # Error should be displayed like this:
-        $this->expectOutputString("<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\"><p>Error handler on line <code>1</code> in your template.</p></div>");
+        $this->expectOutputString("<div style=\"padding:0 1em;border:.5em solid red;font-size:1em;font-weight:normal\"><p>Error handler on line <code>1</code> in your template.</p></div>");
 
         $this->assertFalse(Flavour::errorHandler(0, "Error handler", __FILE__, 1, array()));
     }
