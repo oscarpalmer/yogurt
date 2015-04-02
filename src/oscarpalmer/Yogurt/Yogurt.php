@@ -10,7 +10,7 @@ class Yogurt
     /**
      * @var string Current version number.
      */
-    const VERSION = "1.1.0";
+    const VERSION = "1.2.0";
 
     /**
      * @var Dairy Dairy, the parser.
