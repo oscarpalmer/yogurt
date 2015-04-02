@@ -50,7 +50,11 @@ class Yogurt
             return new Flavour($this, $flavour);
         }
 
-        throw new \InvalidArgumentException("Flavour name must be a string, " . gettype($flavour) . " given.");
+        throw new \InvalidArgumentException(
+            "Flavour name must be a string, \"" .
+            gettype($flavour) .
+            "\" given."
+        );
     }
 
     /**
@@ -90,10 +94,14 @@ class Yogurt
                 return $this;
             }
 
-            throw new \LogicException("The directory {$directory} does not exist.");
+            throw new \LogicException("The directory \"{$directory}\" does not exist.");
         }
 
-        throw new \InvalidArgumentException("Directory name must be a string, " . gettype($directory) . " given.");
+        throw new \InvalidArgumentException(
+            "Directory name must be a string, " .
+            gettype($directory) .
+            " given."
+        );
     }
 
     /**
@@ -110,6 +118,10 @@ class Yogurt
             return $this;
         }
 
-        throw new \InvalidArgumentException("Extension name must be a string, " . gettype($extension) . " given.");
+        throw new \InvalidArgumentException(
+            "Extension name must be a string, \"" .
+            gettype($extension) .
+            "\" given."
+        );
     }
 }

@@ -49,9 +49,24 @@ The syntax is based on regular HTML comments and the control structures (`if` an
 <p><!-- chaining.variables.works.too --></p>
 ```
 
-`variable` is a direct child of the data array (`$flavour->data();`), and the `chaining.variables.works.too` is a nested child of multiple arrays inside the data array.
+`variable` is a direct child of the data object (`$flavour->data();`), and the `chaining.variables.works.too` is a nested child of multiple arrays or objects inside the data object.
 
 Variables _should_ be of the `scalar` type, i.e. `boolean`, `float`, `integer`, or `string`. If not, PHP will scream.
+
+### Variable modifiers
+
+```html
+<p><!-- variable ~ escape --></p>
+```
+
+Variables can be modified, too.
+
+- `dump`: dumps the variable with `var_dump`.
+- `escape`: escapes bad characters, e.g. tags.
+- `json`: transforms anything into valid JSON markup.
+- `lowercase`: converts the string to a lowercase version of it.
+- `trim`: trims the string of leading and trailing whitespace.
+- `uppercase`: converts the string to an uppercase version of it.
 
 ### Including other files
 
@@ -70,7 +85,11 @@ Yogurt will then attempt to find the file in the directory supplied to Yogurt as
 <!-- endfor -->
 ```
 
-`items` _should_ be an array, but `item` can be whatever; just remember to chain names to access the item's children if it isn't `scalar`, like this: `item.title`.
+`items` _should_ be an array or object, but `item` can be whatever; just remember to chain names to access the item's children if it isn't `scalar`, like this: `item.title`.
+
+#### Indexes
+
+When looping, sometimes you need to know the index of the item – i.e. its place in the array or object. The item's index can be accessed by appending `_index` to the array or object's name, e.g. `array_index` for an array named `array`.
 
 ### Ifs and else-ifs
 
@@ -96,10 +115,11 @@ Strings however, do need quotation marks; if they're not wrapped in quotation ma
 
 ## Todo
 
-- String modifiers, e.g. `htmlspecialchars`.
-- Caching.
-- Including variables; i.e. a filename stored as a variable.
-- Other languages?
+- More string modifiers.
+- Adding and removing custom modifier functions.
+- Adding and removing custom parsers functions?
+- Parser-specific classes?
+- Caching?
 
 ## License
 

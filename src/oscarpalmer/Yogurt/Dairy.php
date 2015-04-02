@@ -2,18 +2,27 @@
 
 namespace oscarpalmer\Yogurt;
 
+use oscarpalmer\Yogurt\Exception\Syntax;
+
+// Define ENT_SUBSTITUTE for older versions of PHP.
+// @codeCoverageIgnoreStart
+if (defined("ENT_SUBSTITUTE") === false) {
+    define("ENT_SUBSTITUTE", 0);
+}
+// @codeCoverageIgnoreEnd
+
 /**
  * Dairy, the parser.
  */
 class Dairy
 {
     /**
-     * @var string Useful regex snippets.
+     * @var string Useful regexes and strings.
      */
     const ELSE_REGEX = "/<!--\s*else\s*-->/";
     const ELSEIF_REGEX = "/<!--\s*elseif.*?-->/";
     const ELSEIF_END_REGEX = "\s*|)-->\z/";
-    const ELSEIF_START_REGEX = "/\A<!--\s*elseif\s*";
+    const ELSEIF_START_REGEX = "/\A<!--\s*elseif\s+";
     const FOREACH_REGEX = "/<!--\s*for.*?endfor\s*-->/s";
     const FOREACH_END_REGEX = "\s*-->(.*?)<!--\s*endfor\s*-->\z/s";
     const FOREACH_START_REGEX = "/\A<!--\s*for\s+([\w\-]+)\s+in\s+";
@@ -21,19 +30,55 @@ class Dairy
     const IF_END_REGEX = "\s*|)-->(.*?)<!--\s*endif\s*-->\z/s";
     const IF_START_REGEX = "/\A<!--\s*if\s*";
     const INCLUDE_REGEX = "/<!--\s*include.*?\s*-->/";
-    const INCLUDE_COMPLEX_REGEX = "/\A<!--\s*include\s*([\w]+)(?:\.(\w+)|)\s*-->\z/";
+    const INCLUDE_COMPLEX_REGEX = "/\A<!--\s*include\s+([\w]+)(?:\.(\w+)|)\s*-->\z/";
+    const MODIFIER_GREEDY_REGEX = "(.*?)";
+    const MODIFIER_SEPARATOR_REGEX = "(?:\~|\|)";
     const NO_PHP_REGEX = "/<\?php.*?\?>/";
     const OPERATOR_REGEX = "(?:(={2,3}|!={1,2}|>=|<=|<>|>|<|is|isnt)";
-    const SPACE_REGEX = "\s*";
+    const MULTIPLE_SPACES_REGEX = "/\s+/";
+    const UNKNOWN_SPACES_REGEX = "\s*";
     const VALUE_REGEX = "([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)";
+    const VARIABLE_PREFIX = "<?php echo(htmlspecialchars(";
     const VARIABLE_REGEX = "([\w\-\.\{\}]+)";
     const VARIABLE_END_REGEX = "\s*-->/";
     const VARIABLE_START_REGEX = "/<!--\s*";
+    const VARIABLE_SUFFIX = ", \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")); ?>";
 
     /**
-     * @var string Filename of template.
+     * @var array Array of modifier-function prefixes and suffixes.
      */
-    protected $filename = "unknown template";
+    protected $modifiers = array(
+        "dump" => array(
+            "var_dump(",
+            ")"
+        ),
+        # Useful for combining default output with other modifiers.
+        "escape" => array(
+            "htmlspecialchars(",
+            ", \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")"
+        ),
+        "json" => array(
+            "json_encode(",
+            ")"
+        ),
+        "lowercase" => array(
+            "mb_strtolower(",
+            ", \"utf-8\")"
+        ),
+        "trim" => array(
+            "trim(",
+            ")"
+        ),
+        "uppercase" => array(
+            "mb_strtoupper(",
+            ", \"utf-8\")"
+        )
+    );
+
+    /**
+     * @var string Filename for template.
+     */
+    protected $filename;
 
     /**
      * @var array Settings for Dairy.
@@ -53,10 +98,25 @@ class Dairy
     /** Public functions. */
 
     /**
+     * Get function name for string modifier.
+     *
+     * @param  string     Modifier function name to find.
+     * @return array|null Array of function prefix and suffix or null.
+     */
+    public function getModifierFunction($modifier)
+    {
+        if (array_key_exists($modifier, $this->modifiers)) {
+            return $this->modifiers[$modifier];
+        }
+
+        return null;
+    }
+
+    /**
      * Parse a template.
      *
      * @param  string  $filename      Filename for template.
-     * @param  boolean $save_filename Save filename in object? Default is true; false if parsing included content.
+     * @param  boolean $save_filename Save filename in object? False if parsing included content.
      * @return string  Parsed template.
      */
     public function parse($filename, $save_filename = true)
@@ -72,10 +132,11 @@ class Dairy
             $template = $this->parseForeachs($template);
             $template = $this->parseIfs($template);
             $template = $this->parseIncludes($template);
+            $template = $this->parseModifiers($template);
             $template = $this->parseVariables($template);
 
             return $template;
-        } catch (\Exception $exception) {
+        } catch (Syntax $exception) {
             static::displaySyntaxErrorMessage($exception, $this->filename);
         }
     }
@@ -100,12 +161,15 @@ class Dairy
             );
 
             if (empty($foreach)) {
-                throw new \LogicException($match);
+                throw new Syntax($match);
             }
 
             $array = static::getObjectKey($foreach[2]);
 
-            $replacement = "<?php foreach({$array} as \${$foreach[1]}): ?>{$foreach[3]}<?php endforeach; ?>";
+            preg_match("/\A(?:|.*->)(.*)\z/", $array, $index);
+
+            $replacement = "<?php foreach({$array} as {$index[1]}_index => \${$foreach[1]}): ?>";
+            $replacement .= "{$foreach[3]}<?php endforeach; ?>";
 
             $template = str_replace($match, $replacement, $template);
         }
@@ -128,9 +192,9 @@ class Dairy
                 static::IF_REGEX,
                 static::IF_START_REGEX .
                 static::VALUE_REGEX .
-                static::SPACE_REGEX .
+                static::UNKNOWN_SPACES_REGEX .
                 static::OPERATOR_REGEX .
-                static::SPACE_REGEX .
+                static::UNKNOWN_SPACES_REGEX .
                 static::VALUE_REGEX .
                 static::IF_END_REGEX
             ),
@@ -138,24 +202,24 @@ class Dairy
                 static::ELSEIF_REGEX,
                 static::ELSEIF_START_REGEX .
                 static::VALUE_REGEX .
-                static::SPACE_REGEX .
+                static::UNKNOWN_SPACES_REGEX .
                 static::OPERATOR_REGEX .
-                static::SPACE_REGEX .
+                static::UNKNOWN_SPACES_REGEX .
                 static::VALUE_REGEX .
                 static::ELSEIF_END_REGEX
             )
         );
 
         foreach ($regex as $name => $regex_array) {
-            preg_match_all($regex_array[0], $template, $if_matches);
+            preg_match_all($regex_array[0], $template, $matches);
 
             $elseif = $name == "elseif";
 
-            foreach ($if_matches[0] as $match) {
+            foreach ($matches[0] as $match) {
                 preg_match($regex_array[1], $match, $if);
 
                 if (empty($if)) {
-                    throw new \LogicException($match);
+                    throw new Syntax($match);
                 }
 
                 $exists = empty($if[2]);
@@ -193,7 +257,7 @@ class Dairy
             preg_match(static::INCLUDE_COMPLEX_REGEX, $match, $include);
 
             if (empty($include)) {
-                throw new \LogicException($match);
+                throw new Syntax($match);
             }
 
             $file = $include[1];
@@ -206,6 +270,68 @@ class Dairy
             }
 
             $template = str_replace($match, $this->parse($filename, false), $template);
+        }
+
+        return $template;
+    }
+
+    /**
+     * Parse variables with modifiers.
+     *
+     * @param  string $template Template to parse.
+     * @return Parsed Template.
+     */
+    public function parseModifiers($template)
+    {
+        preg_match_all(
+            static::VARIABLE_START_REGEX .
+            static::VARIABLE_REGEX .
+            static::UNKNOWN_SPACES_REGEX .
+            static::MODIFIER_SEPARATOR_REGEX .
+            static::UNKNOWN_SPACES_REGEX .
+            static::MODIFIER_GREEDY_REGEX .
+            static::VARIABLE_END_REGEX,
+            $template,
+            $matches
+        );
+
+        foreach ($matches[0] as $index => $match) {
+            $functions = preg_split(static::MULTIPLE_SPACES_REGEX, $matches[2][$index]);
+            $functions = array_reverse($functions);
+
+            if (count($functions) === 1 && $functions[0] === "escape") {
+                $template = static::replaceVariable($match, $matches[1][$index], $template);
+
+                continue;
+            }
+
+            $prefix = array();
+            $suffix = array();
+
+            foreach ($functions as $function) {
+                if ($function === "raw") {
+                    continue;
+                }
+
+                $parts = $this->getModifierFunction($function);
+
+                if (is_null($parts)) {
+                    throw new Syntax($match);
+                }
+
+                array_push($prefix, $parts[0]);
+                array_unshift($suffix, $parts[1]);
+            }
+
+            $template = str_replace(
+                $match,
+                "<?php echo(" .
+                implode($prefix) .
+                static::getObjectKey($matches[1][$index]) .
+                implode($suffix) .
+                "); ?>",
+                $template
+            );
         }
 
         return $template;
@@ -230,7 +356,11 @@ class Dairy
         foreach ($matches[0] as $index => $variable) {
             $var = static::getObjectKey($matches[1][$index]);
 
-            $template = str_replace($variable, "<?php echo({$var}); ?>", $template);
+            $template = static::replaceVariable(
+                $variable,
+                $matches[1][$index],
+                $template
+            );
         }
 
         return $template;
@@ -246,8 +376,9 @@ class Dairy
      */
     public static function displaySyntaxErrorMessage(\Exception $exception, $filename)
     {
-        $prefix = "<div style=\"padding:0 1em;border:.5em solid red;font-size:1rem;font-weight:normal\">";
-        $prefix .= "<p><b>Error!</b></p>";
+        $prefix = "<div style=\"padding:0 1em;border:.5em solid red;";
+        $prefix .= "font-size:1em;font-weight:normal\">";
+        $prefix .= "<p><b>Syntax error!</b></p>";
 
         $middle = "<p>The syntax below is invalid and can be found in the template file";
         $middle .= " <code>{$filename}</code>.</p>";
@@ -268,7 +399,7 @@ class Dairy
      */
     public static function getObjectKey($key)
     {
-        $key = preg_replace("/(\A|\.)(\d+)(\.|\z)/", "\\1{\\2}\\3", $key);
+        $key = preg_replace("/\.(\d+)(\.|)/", "{\\1}\\2", $key);
         $key = str_replace(".", "->", $key);
 
         return "\${$key}";
@@ -308,5 +439,24 @@ class Dairy
         }
 
         return static::getObjectKey($value);
+    }
+
+    /**
+     * Replace variable-syntax with PHP syntax.
+     *
+     * @param  string $variable    Substring to replace.
+     * @param  string $replacement String to insert.
+     * @param  string $string      String to replace within.
+     * @return string String with PHP syntax.
+     */
+    public static function replaceVariable($variable, $replacement, $string)
+    {
+        return str_replace(
+            $variable,
+            static::VARIABLE_PREFIX .
+            static::getObjectKey($replacement) .
+            static::VARIABLE_SUFFIX,
+            $string
+        );
     }
 }
