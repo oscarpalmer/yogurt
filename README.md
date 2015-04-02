@@ -118,6 +118,7 @@ Strings however, do need quotation marks; if they're not wrapped in quotation ma
 - More string modifiers.
 - Adding and removing custom modifier functions.
 - Adding and removing custom parsers functions?
+- Parser-specific classes?
 - Caching?
 
 ## License

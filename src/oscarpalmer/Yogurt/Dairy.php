@@ -135,8 +135,6 @@ class Dairy
             $template = $this->parseModifiers($template);
             $template = $this->parseVariables($template);
 
-            #var_dump($template);exit;
-
             return $template;
         } catch (Syntax $exception) {
             static::displaySyntaxErrorMessage($exception, $this->filename);
