@@ -61,7 +61,9 @@ Variables _should_ be of the `scalar` type, i.e. `boolean`, `float`, `integer`, 
 
 Variables can be modified, too.
 
+- `dump`: dumps the variable with `var_dump`.
 - `escape`: escapes bad characters, e.g. tags.
+- `json`: transforms anything into valid JSON markup.
 - `lowercase`: converts the string to a lowercase version of it.
 - `trim`: trims the string of leading and trailing whitespace.
 - `uppercase`: converts the string to an uppercase version of it.

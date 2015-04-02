@@ -2,6 +2,8 @@
 
 namespace oscarpalmer\Yogurt;
 
+use oscarpalmer\Yogurt\Exception\Syntax;
+
 // Define ENT_SUBSTITUTE for older versions of PHP.
 // @codeCoverageIgnoreStart
 if (defined("ENT_SUBSTITUTE") === false) {
@@ -36,7 +38,7 @@ class Dairy
     const MULTIPLE_SPACES_REGEX = "/\s+/";
     const UNKNOWN_SPACES_REGEX = "\s*";
     const VALUE_REGEX = "([\w\-\.\{\}]+|(?:\"|').*?(?:\"|')|\d+)";
-    const VARIABLE_PREFIX = "<?php echo(htmlspecialchars((string) ";
+    const VARIABLE_PREFIX = "<?php echo(htmlspecialchars(";
     const VARIABLE_REGEX = "([\w\-\.\{\}]+)";
     const VARIABLE_END_REGEX = "\s*-->/";
     const VARIABLE_START_REGEX = "/<!--\s*";
@@ -46,10 +48,18 @@ class Dairy
      * @var array Array of modifier-function prefixes and suffixes.
      */
     protected $modifiers = array(
+        "dump" => array(
+            "var_dump(",
+            ")"
+        ),
         # Useful for combining default output with other modifiers.
         "escape" => array(
             "htmlspecialchars(",
             ", \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")"
+        ),
+        "json" => array(
+            "json_encode(",
+            ")"
         ),
         "lowercase" => array(
             "mb_strtolower(",
@@ -66,7 +76,7 @@ class Dairy
     );
 
     /**
-     * @var string Filename of template.
+     * @var string Filename for template.
      */
     protected $filename;
 
@@ -106,7 +116,7 @@ class Dairy
      * Parse a template.
      *
      * @param  string  $filename      Filename for template.
-     * @param  boolean $save_filename Save filename in object? Default is true; false if parsing included content.
+     * @param  boolean $save_filename Save filename in object? False if parsing included content.
      * @return string  Parsed template.
      */
     public function parse($filename, $save_filename = true)
@@ -128,7 +138,7 @@ class Dairy
             #var_dump($template);exit;
 
             return $template;
-        } catch (\Exception $exception) {
+        } catch (Syntax $exception) {
             static::displaySyntaxErrorMessage($exception, $this->filename);
         }
     }
@@ -153,12 +163,14 @@ class Dairy
             );
 
             if (empty($foreach)) {
-                throw new \LogicException($match);
+                throw new Syntax($match);
             }
 
             $array = static::getObjectKey($foreach[2]);
 
-            $replacement = "<?php foreach({$array} as {$array}_index => \${$foreach[1]}): ?>";
+            preg_match("/\A(?:|.*->)(.*)\z/", $array, $index);
+
+            $replacement = "<?php foreach({$array} as {$index[1]}_index => \${$foreach[1]}): ?>";
             $replacement .= "{$foreach[3]}<?php endforeach; ?>";
 
             $template = str_replace($match, $replacement, $template);
@@ -209,7 +221,7 @@ class Dairy
                 preg_match($regex_array[1], $match, $if);
 
                 if (empty($if)) {
-                    throw new \LogicException($match);
+                    throw new Syntax($match);
                 }
 
                 $exists = empty($if[2]);
@@ -247,7 +259,7 @@ class Dairy
             preg_match(static::INCLUDE_COMPLEX_REGEX, $match, $include);
 
             if (empty($include)) {
-                throw new \LogicException($match);
+                throw new Syntax($match);
             }
 
             $file = $include[1];
@@ -306,7 +318,7 @@ class Dairy
                 $parts = $this->getModifierFunction($function);
 
                 if (is_null($parts)) {
-                    throw new \LogicException($match);
+                    throw new Syntax($match);
                 }
 
                 array_push($prefix, $parts[0]);
@@ -317,7 +329,6 @@ class Dairy
                 $match,
                 "<?php echo(" .
                 implode($prefix) .
-                "(string) " .
                 static::getObjectKey($matches[1][$index]) .
                 implode($suffix) .
                 "); ?>",
@@ -390,7 +401,7 @@ class Dairy
      */
     public static function getObjectKey($key)
     {
-        $key = preg_replace("/(\A|\.)(\d+)(\.|\z)/", "\\1{\\2}\\3", $key);
+        $key = preg_replace("/\.(\d+)(\.|)/", "{\\1}\\2", $key);
         $key = str_replace(".", "->", $key);
 
         return "\${$key}";

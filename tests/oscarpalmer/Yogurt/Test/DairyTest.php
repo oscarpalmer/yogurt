@@ -4,6 +4,7 @@ namespace oscarpalmer\Yogurt\Test;
 
 use oscarpalmer\Yogurt\Dairy;
 use oscarpalmer\Yogurt\Yogurt;
+use oscarpalmer\Yogurt\Exception\Syntax;
 
 class DairyTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +22,7 @@ class DairyTest extends \PHPUnit_Framework_TestCase
             "extension" => "html"
         ));
 
-        $this->htmlsc_start = "<?php echo(htmlspecialchars((string) ";
+        $this->htmlsc_start = "<?php echo(htmlspecialchars(";
         $this->htmlsc_end = ", \ENT_QUOTES | \ENT_SUBSTITUTE, \"utf-8\")";
     }
 
@@ -36,7 +37,9 @@ class DairyTest extends \PHPUnit_Framework_TestCase
     public function testModifiers()
     {
         $functions = array(
+            "dump" => array("var_dump(", ")"),
             "escape" => array("htmlspecialchars(", $this->htmlsc_end),
+            "json" => array("json_encode(", ")"),
             "lowercase" => array("mb_strtolower(", ", \"utf-8\")"),
             "trim" => array("trim(", ")"),
             "uppercase" => array("mb_strtoupper(", ", \"utf-8\")")
@@ -55,8 +58,8 @@ class DairyTest extends \PHPUnit_Framework_TestCase
         foreach (array("parseForeachs", "parseIfs", "parseIncludes", "parseModifiers") as $method) {
             try {
                 $dairy->$method($template);
-            } catch (\Exception $e) {
-                $this->assertInstanceOf("LogicException", $e);
+            } catch (Syntax $e) {
+                $this->assertInstanceOf("oscarpalmer\Yogurt\Exception\Syntax", $e);
             }
         }
 
@@ -126,9 +129,14 @@ class DairyTest extends \PHPUnit_Framework_TestCase
         echo($template);
 
         $this->expectOutputString(
+            "<?php echo(var_dump(\$variable)); ?>\n" .
             "{$this->htmlsc_start}\$variable{$this->htmlsc_end}); ?>\n" .
-            "<?php echo((string) \$variable); ?>\n" .
-            "<?php echo(trim((string) \$variable)); ?>"
+            "<?php echo(json_encode(\$variable)); ?>\n" .
+            "<?php echo(mb_strtolower(\$variable, \"utf-8\")); ?>\n" .
+            "<?php echo(\$variable); ?>\n" .
+            "<?php echo(trim(\$variable)); ?>\n" .
+            "<?php echo(trim(\$variable)); ?>\n" .
+            "<?php echo(mb_strtoupper(\$variable, \"utf-8\")); ?>"
         );
     }
 
@@ -142,8 +150,7 @@ class DairyTest extends \PHPUnit_Framework_TestCase
         echo($template);
 
         $this->expectOutputString(
-            "{$this->htmlsc_start}\$title{$this->htmlsc_end}); ?>;" .
-            " " .
+            "{$this->htmlsc_start}\$title{$this->htmlsc_end}); ?>; " .
             "{$this->htmlsc_start}\$object->title{$this->htmlsc_end}); ?>"
         );
     }
@@ -172,7 +179,7 @@ class DairyTest extends \PHPUnit_Framework_TestCase
     public function testGetObjectKey()
     {
         $this->assertSame("\$this->is->a->key", Dairy::getObjectKey("this.is.a.key"));
-        $this->assertSame("\$so->{0}->is->{0}->this", Dairy::getObjectKey("so.0.is.0.this"));
+        $this->assertSame("\$so{0}->is{0}->this", Dairy::getObjectKey("so.0.is.0.this"));
     }
 
     public function testGetOperator()
@@ -207,6 +214,6 @@ class DairyTest extends \PHPUnit_Framework_TestCase
 
         # Keys and variables.
         $this->assertSame("\$this->is->a->key", Dairy::getValue("this.is.a.key"));
-        $this->assertSame("\$so->{0}->is->{0}->this", Dairy::getValue("so.0.is.0.this"));
+        $this->assertSame("\$so{0}->is{0}->this", Dairy::getValue("so.0.is.0.this"));
     }
 }
