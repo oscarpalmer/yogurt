@@ -6,6 +6,11 @@ use \oscarpalmer\Yogurt\Exception\Syntax;
 
 class Ifs extends Worker
 {
+    /**
+     * Parse if-syntax in template.
+     *
+     * @return string Parsed template.
+     */
     public function parse()
     {
         $this->template = preg_replace(static::ELSE_REGEX, "<?php else: ?>", $this->template);

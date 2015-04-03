@@ -140,6 +140,12 @@ class Dairy
         );
     }
 
+    /**
+     * Get the error message prefix with custom title.
+     *
+     * @param  string $prefix Prefix to insert.
+     * @return string Prefix for message.
+     */
     public static function errorPrefix($prefix)
     {
         return "<div style=\"padding:0 1em;border:.5em solid red;" .
@@ -147,6 +153,12 @@ class Dairy
                "<h2>{$prefix}</h2>";
     }
 
+    /**
+     * Get the error message suffix with custom content.
+     *
+     * @param  string $suffix Content to insert.
+     * @return string Suffix for message.
+     */
     public static function errorSuffix($suffix)
     {
         $suffix = preg_replace("/>\s+</", ">\n<", $suffix);

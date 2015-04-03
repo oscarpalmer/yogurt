@@ -78,6 +78,20 @@ class Flavour
     }
 
     /**
+     * Array to object and then object to associative array.
+     *
+     * @return array|object Array or object of data.
+     */
+    public function getDataObject()
+    {
+        $data = $this->data;
+        $data = static::itemToObject($data);
+        $data = get_object_vars($data);
+
+        return $data;
+    }
+
+    /**
      * Get current filename.
      *
      * @return string Filename.
@@ -90,7 +104,8 @@ class Flavour
     /**
      * Set the filename.
      *
-     * @param string $name Filename to set.
+     * @param  string  $name Filename to set.
+     * @return Flavour Flavour object for optional chaining.
      */
     public function setFilename($name)
     {
@@ -141,22 +156,6 @@ class Flavour
         restore_error_handler();
 
         return ob_get_clean();
-    }
-
-    /** Protected functions. */
-
-    /**
-     * Array to object and then object to associative array.
-     *
-     * @return array|object Array or object of data.
-     */
-    public function getDataObject()
-    {
-        $data = $this->data;
-        $data = static::itemToObject($data);
-        $data = get_object_vars($data);
-
-        return $data;
     }
 
     /** Static functions. */

@@ -6,6 +6,11 @@ use \oscarpalmer\Yogurt\Exception\Syntax;
 
 class Variables extends Worker
 {
+    /**
+     * Parse variable-syntax in template.
+     *
+     * @return string Parsed template.
+     */
     public function parse()
     {
         preg_match_all(

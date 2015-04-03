@@ -48,7 +48,7 @@ abstract class Worker
     }
 
     /**
-     *
+     * Abstract method for parser classes.
      */
     abstract public function parse();
 

@@ -6,6 +6,11 @@ use \oscarpalmer\Yogurt\Exception\Syntax;
 
 class Foreachs extends Worker
 {
+    /**
+     * Parse foreach-syntax in template.
+     *
+     * @return string Parsed template.
+     */
     public function parse()
     {
         preg_match_all(static::FOREACH_REGEX, $this->template, $matches);

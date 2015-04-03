@@ -6,6 +6,11 @@ use \oscarpalmer\Yogurt\Exception\Syntax;
 
 class Modifiers extends Worker
 {
+    /**
+     * Parse modififer-syntax in template.
+     *
+     * @return string Parsed template.
+     */
     public function parse()
     {
         preg_match_all(

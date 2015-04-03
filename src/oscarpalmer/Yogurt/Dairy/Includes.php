@@ -6,6 +6,11 @@ use \oscarpalmer\Yogurt\Exception\Syntax;
 
 class Includes extends Worker
 {
+    /**
+     * Parse include-syntax in template.
+     *
+     * @return string Parsed template.
+     */
     public function parse()
     {
         preg_match_all(static::INCLUDE_REGEX, $this->template, $matches);
