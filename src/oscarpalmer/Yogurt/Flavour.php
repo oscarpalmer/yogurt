@@ -181,7 +181,7 @@ class Flavour
         $prefix .= "font-size:1em;font-weight:normal\"><p>";
         $suffix = " on line <code>{$line}</code> in your template.</p></div>";
 
-        echo("{$prefix}{$string}{$suffix}");
+        echo($prefix . $string . $suffix);
 
         return true;
     }
@@ -194,6 +194,10 @@ class Flavour
      */
     public static function itemToObject($item)
     {
+        if (is_null($item)) {
+            $item = new \stdClass;
+        }
+
         return json_decode(json_encode($item), false);
     }
 }

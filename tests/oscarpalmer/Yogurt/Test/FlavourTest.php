@@ -134,6 +134,11 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
         # Valid object.
         $this->assertNotNull($object);
         $this->assertInstanceOf("stdClass", $object);
+
+        $object = Flavour::itemToObject(null);
+
+        $this->assertNotNull($object);
+        $this->assertInstanceOf("stdClass", $object);
     }
 
     public function testErrorHandler()
