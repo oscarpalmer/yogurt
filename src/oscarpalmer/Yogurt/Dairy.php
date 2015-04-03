@@ -92,11 +92,17 @@ class Dairy
             $template = file_get_contents($filename);
             $template = preg_replace("/<\?php.*?\?>/", "", $template);
 
-            $template = (new Dairy\Foreachs($this, $template))->parse($template);
-            $template = (new Dairy\Ifs($this, $template))->parse($template);
-            $template = (new Dairy\Includes($this, $template))->parse($template);
-            $template = (new Dairy\Modifiers($this, $template))->parse($template);
-            $template = (new Dairy\Variables($this, $template))->parse($template);
+            foreach (array(
+                "oscarpalmer\Yogurt\Dairy\Foreachs",
+                "oscarpalmer\Yogurt\Dairy\Ifs",
+                "oscarpalmer\Yogurt\Dairy\Includes",
+                "oscarpalmer\Yogurt\Dairy\Modifiers",
+                "oscarpalmer\Yogurt\Dairy\Variables"
+            ) as $class) {
+                $parser = new $class($this, $template);
+
+                $template = $parser->parse();
+            }
 
             return $template;
         } catch (Syntax $exception) {
