@@ -1,3 +1,7 @@
+env:
+  global:
+    - CODECOV_TOKEN="9cad37df-1679-4924-bd27-76e0081f96bd"
+
 language: php
 
 php:
@@ -10,7 +14,7 @@ php:
 
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer install --no-interaction --prefer-source --dev
+  - travis_retry composer install --no-interaction --prefer-source
 
 script:
   - vendor/bin/phpunit --coverage-clover=coverage.xml
