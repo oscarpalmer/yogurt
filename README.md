@@ -115,6 +115,7 @@ Strings however, do need quotation marks; if they're not wrapped in quotation ma
 
 ## Todo
 
+- Update for PHP7, new PHPUnit, etc.
 - More string modifiers.
 - Adding and removing custom modifier functions.
 - Adding and removing custom parsers functions?
