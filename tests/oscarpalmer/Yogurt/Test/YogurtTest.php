@@ -6,7 +6,7 @@ use oscarpalmer\Yogurt\Dairy;
 use oscarpalmer\Yogurt\Flavour;
 use oscarpalmer\Yogurt\Yogurt;
 
-class YogurtTest extends \PHPUnit_Framework_TestCase
+class YogurtTest extends \PHPUnit\Framework\TestCase
 {
     # Mock variables.
     protected $directory;
