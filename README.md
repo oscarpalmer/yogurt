@@ -1,8 +1,8 @@
 # Yogurt
 
-[![PHP version](https://badge.fury.io/ph/oscarpalmer%2Fyogurt.png)](http://badge.fury.io/ph/oscarpalmer%2Fyogurt) [![Build Status](https://travis-ci.org/oscarpalmer/yogurt.png?branch=master)](https://travis-ci.org/oscarpalmer/yogurt) [![Coverage Status](https://coveralls.io/repos/oscarpalmer/yogurt/badge.png)](https://coveralls.io/r/oscarpalmer/yogurt)
+[![PHP version](https://badge.fury.io/ph/oscarpalmer%2Fyogurt.png)](http://badge.fury.io/ph/oscarpalmer%2Fyogurt) [![Build Status](https://travis-ci.org/oscarpalmer/yogurt.png?branch=master)](https://travis-ci.org/oscarpalmer/yogurt) [![Coverage Status](https://codecov.io/gh/oscarpalmer/yogurt/branch/master/graph/badge.svg)](https://codecov.io/gh/oscarpalmer/yogurt)
 
-Yogurt is a template language for PHP (`>=5.3`) inspired by [Riot's](http://riothq.com) [Hammer](http://hammerformac.com). Hammer's syntax was based on regular ol' HTML comment tags, so you won't have to install another syntax highlighter for your editor. Nice, huh?
+Yogurt is a template language for PHP (`>=5.3`) inspired by [Beach's](http://beach.io) [Hammer](http://hammerformac.com). Hammer's syntax was based on regular ol' HTML comment tags, so you won't have to install another syntax highlighter for your editor. Nice, huh?
 
 ## Getting started
 
@@ -115,7 +115,6 @@ Strings however, do need quotation marks; if they're not wrapped in quotation ma
 
 ## Todo
 
-- Update for PHP7, new PHPUnit, etc.
 - More string modifiers.
 - Adding and removing custom modifier functions.
 - Adding and removing custom parsers functions?
