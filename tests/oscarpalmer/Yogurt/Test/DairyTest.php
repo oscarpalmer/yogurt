@@ -11,7 +11,7 @@ use oscarpalmer\Yogurt\Dairy\Variables;
 use oscarpalmer\Yogurt\Yogurt;
 use oscarpalmer\Yogurt\Exception\Syntax;
 
-class DairyTest extends \PHPUnit_Framework_TestCase
+class DairyTest extends \PHPUnit\Framework\TestCase
 {
     # Mock variables.
     protected $directory;

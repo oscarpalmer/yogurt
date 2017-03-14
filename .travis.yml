@@ -1,3 +1,7 @@
+env:
+  global:
+    - CODECOV_TOKEN="9cad37df-1679-4924-bd27-76e0081f96bd"
+
 language: php
 
 php:
@@ -5,13 +9,15 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - 7.0
+  - 7.1
 
 before_script:
-  - composer self-update
-  - composer install
-  - pyrus install pear/PHP_CodeSniffer
-  - phpenv rehash
+  - travis_retry composer self-update
+  - travis_retry composer install --no-interaction --prefer-source
 
 script:
-  - phpcs --standard=psr2 src/
-  - phpunit --coverage-text
+  - vendor/bin/phpunit --coverage-clover=coverage.xml
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

@@ -5,7 +5,7 @@ namespace oscarpalmer\Yogurt\Test;
 use oscarpalmer\Yogurt\Flavour;
 use oscarpalmer\Yogurt\Yogurt;
 
-class FlavourTest extends \PHPUnit_Framework_TestCase
+class FlavourTest extends \PHPUnit\Framework\TestCase
 {
     # Mock variables.
     protected $data;
@@ -80,6 +80,8 @@ class FlavourTest extends \PHPUnit_Framework_TestCase
         $flavour->data($this->data);
 
         $dataObject = $flavour->getDataObject();
+
+        $this->assertNotNull($dataObject);
     }
 
     public function testGetFilename()
